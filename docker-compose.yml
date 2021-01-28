@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-
+      
   db:
     container_name: billtracker_db
     image: postgres:13-alpine
@@ -12,7 +12,7 @@ services:
       - 5432:5432
     volumes:
       - db:/data/postgres
-    restart: unless-stopped
+    restart: on-failure
 
   pgadmin:
     container_name: billtracker_pgadmin
@@ -24,7 +24,7 @@ services:
        - ./pgadmin_servers.json:/pgadmin4/servers.json
     ports:
       - 5050:80
-    restart: unless-stopped
+    restart: on-failure
 
 volumes:
   db:

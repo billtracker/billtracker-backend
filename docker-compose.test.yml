@@ -12,6 +12,7 @@ services:
       BILLTRACKER_CONNECTIONSTRINGS__DATABASE: "Server=billtracker_db;Database=BillTracker;Port=5432;User Id=postgres;Password=123456;Timeout=120;"
     ports:
       - 5000:5000
+    restart: on-failure
     depends_on:
       - db
       
@@ -25,7 +26,7 @@ services:
       - 5432:5432
     volumes:
       - db:/data/postgres
-    restart: unless-stopped
+    restart: on-failure
 
   pgadmin:
     container_name: billtracker_pgadmin
@@ -37,7 +38,7 @@ services:
        - ./pgadmin_servers.json:/pgadmin4/servers.json
     ports:
       - 5050:80
-    restart: unless-stopped
+    restart: on-failure
 
 volumes:
   db:

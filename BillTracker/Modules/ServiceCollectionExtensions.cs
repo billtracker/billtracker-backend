@@ -6,7 +6,7 @@ namespace BillTracker.Modules
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureBaseServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureBaseServices(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
         {
             services
                 .AddDbContext<BillTrackerContext>(opt =>
@@ -16,7 +16,10 @@ namespace BillTracker.Modules
                         builder => builder.EnableRetryOnFailure());
                 });
 
-            services.BuildServiceProvider().GetService<BillTrackerContext>().Database.Migrate();
+            if (isDevelopment)
+            {
+                services.BuildServiceProvider().GetService<BillTrackerContext>().Database.Migrate();
+            }
 
             return services;
         }

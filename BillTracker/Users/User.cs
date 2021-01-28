@@ -10,15 +10,15 @@ namespace BillTracker.Users
                         firstName: firstName,
                         lastName: lastName,
                         password: password,
-                        createdOn: DateTimeOffset.Now);
+                        createdAt: DateTimeOffset.Now);
 
-        public User(Guid id, string firstName, string lastName, string password, DateTimeOffset createdOn)
+        public User(Guid id, string firstName, string lastName, string password, DateTimeOffset createdAt)
         {
             Id = id;
             FirstName = firstName;
             LastName = lastName;
             Password = password;
-            CreatedOn = createdOn;
+            CreatedAt = createdAt;
         }
 
         public Guid Id { get; private set; }
@@ -33,6 +33,6 @@ namespace BillTracker.Users
         public string Password { get; private set; }
 
         [Required]
-        public DateTimeOffset CreatedOn { get; private set; }
+        public DateTimeOffset CreatedAt { get; private set; }
     }
 }
