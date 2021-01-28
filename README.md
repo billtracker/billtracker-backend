@@ -20,12 +20,16 @@ For local development purposes we use Docker to set up PostgreSQL database and P
 Be sure that you are in the root folder of the solution.
 
 ### Only infrastructure:
+Infrastructure elements:
+    - PostreSQL
+    - PGAdmin4
+
 ```bash
 docker-compose up -d
 ```
 
 ### Whole app:
-If you want to run the whole environment or restart after introducing some changes.
+If you want to run the whole infrastracture with application or restart app after introducing some changes.
 
 ```bash
 docker-compose -f docker-compose.test.yml up -d --build
