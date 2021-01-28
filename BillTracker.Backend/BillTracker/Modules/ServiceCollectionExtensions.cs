@@ -11,8 +11,12 @@ namespace BillTracker.Modules
             services
                 .AddDbContext<BillTrackerContext>(opt =>
                 {
-                    opt.UseNpgsql(configuration.GetConnectionString("Database"));
+                    opt.UseNpgsql(
+                        configuration.GetConnectionString("Database"),
+                        builder => builder.EnableRetryOnFailure());
                 });
+
+            services.BuildServiceProvider().GetService<BillTrackerContext>().Database.Migrate();
 
             return services;
         }

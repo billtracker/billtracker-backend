@@ -2,6 +2,19 @@ version: "3.7"
 
 services:
 
+  be:
+    container_name: billtracker_be
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      BILLTRACKER_CONNECTIONSTRINGS__DATABASE: "Server=billtracker_db;Database=BillTracker;Port=5432;User Id=postgres;Password=123456;Timeout=120;"
+    ports:
+      - 5100:5000
+    depends_on:
+      - db
+      
   db:
     container_name: billtracker_db
     image: postgres:13-alpine
