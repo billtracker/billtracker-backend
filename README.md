@@ -17,7 +17,6 @@ This project contains all logic of Bill Tracker application, including auth, use
 For local development purposes we use Docker to set up PostgreSQL database and PGAdmin4.
 
 ## 3. Build & Run
-Be sure that you are in the root folder of the solution.
 
 ### Only infrastructure:
 Infrastructure elements:
