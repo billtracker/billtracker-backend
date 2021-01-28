@@ -17,14 +17,11 @@ run the app: either locally or in Docker.
     - [Visual Studio Code](https://code.visualstudio.com/)
 
 ## 3. Docker
-For local development purposes we use Docker to set up PostgreSQL database and PGAdmin4.
+For local development purposes we use Docker to set up infrastructure (PostgreSQL, PGAdmin4) and optionally the application (for frontend development).
 
 ## 4. Build & Run
 
 ### Only infrastructure:
-Infrastructure elements:
-  - PostreSQL
-  - PGAdmin4
 
 ```bash
 docker-compose up -d
