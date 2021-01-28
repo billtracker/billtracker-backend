@@ -49,6 +49,6 @@ The pgAdmin4 tool can be open in the browser under the link http://localhost:505
 - Email: pgadmin4@pgadmin.org
 - Password: admin
 
-_Sometimes an error is shown up about "CSRF token". Ignore it, and hit the "Login" button until you are logged in._
+_Sometimes an error is shown with some message about "CSRF token". Ignore it, and hit the "Login" button until you are logged in._
 
-In case the popup with database password is shown, password is "123456", check "Save password" and login. This is done once and each time after docker volumes are removed.
+In case the popup with database password is shown, put "123456", check "Save password" and confirm. This is done once and each time after docker volumes are removed.
