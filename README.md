@@ -21,7 +21,7 @@ For local development purposes all instances can be contenerized using Docker. t
 
 ## 4. Build & Run
 
-### Infrastructure:
+### Infrastructure (for Backend contributors):
 
 Infrastructure elements:
 - PostgreSQL
@@ -31,16 +31,15 @@ Infrastructure elements:
 docker-compose up -d
 ```
 
-Endpoint of locally run backend app: http://localhost:5000
 
-### Infrastructure with application:
+### Infrastructure with application (for Frontend devs)):
 Setting up the whole infrastracture with application or restarting the app after introducing some changes, can be done by running the command below.
 
 ```bash
 docker-compose -f docker-compose.test.yml up -d --build
 ```
 
-Endpoint of dockerized backend app: http://localhost:5100
+Endpoint of backend app: http://localhost:5000
 
 ### pgAdmin4
 "pgAdmin is the most popular and feature rich Open Source administration and development platform for PostgreSQL, the most advanced Open Source database in the world."

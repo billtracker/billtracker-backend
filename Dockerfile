@@ -16,6 +16,5 @@ WORKDIR /app
 COPY --from=build /app/out .
 
 ENV ASPNETCORE_URLS=http://0.0.0.0:5000
-EXPOSE 80
 
 ENTRYPOINT ["dotnet", "BillTracker.Api.dll"]
