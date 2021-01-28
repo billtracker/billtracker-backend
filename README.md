@@ -32,7 +32,7 @@ docker-compose up -d
 ```
 
 
-### Infrastructure with application (for Frontend devs)):
+### Infrastructure with application (for Frontend devs):
 Setting up the whole infrastracture with application or restarting the app after introducing some changes, can be done by running the command below.
 
 ```bash
