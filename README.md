@@ -23,8 +23,8 @@ For local development purposes we use Docker to set up PostgreSQL database and P
 
 ### Only infrastructure:
 Infrastructure elements:
-    - PostreSQL
-    - PGAdmin4
+  - PostreSQL
+  - PGAdmin4
 
 ```bash
 docker-compose up -d
