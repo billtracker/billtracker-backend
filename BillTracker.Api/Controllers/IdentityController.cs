@@ -1,11 +1,13 @@
 ﻿using System.Threading.Tasks;
 using BillTracker.Api.Models;
 using BillTracker.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BillTracker.Api.Controllers
 {
+    [AllowAnonymous]
     [Route("user")]
     public class IdentityController : ControllerBase
     {

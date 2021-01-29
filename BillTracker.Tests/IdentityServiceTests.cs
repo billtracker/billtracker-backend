@@ -12,6 +12,8 @@ namespace BillTracker.Tests
         private readonly DbContextMock<BillTrackerContext> _dbContextMock =
             new DbContextMock<BillTrackerContext>(new DbContextOptions<BillTrackerContext>());
 
+        private readonly IdentityConfiguration identityConfiguration = new IdentityConfiguration { Secret = "dev" };
+
         public IdentityServiceTests()
         {
             _dbContextMock.CreateDbSetMock(m => m.Users);
@@ -20,7 +22,7 @@ namespace BillTracker.Tests
         [Fact]
         public async Task CanRegisterIfEmailAddressIsNotTaken()
         {
-            var sut = new IdentityService(_dbContextMock.Object);
+            var sut = new IdentityService(_dbContextMock.Object, identityConfiguration);
 
             var result = await sut.Register("test@xyz.com", "pass1", "name", "last");
 
@@ -31,7 +33,7 @@ namespace BillTracker.Tests
         [Fact]
         public async Task CantRegisterIfEmailAddressIsTaken()
         {
-            var sut = new IdentityService(_dbContextMock.Object);
+            var sut = new IdentityService(_dbContextMock.Object, identityConfiguration);
 
             await sut.Register("test@xyz.com", "pass1", "name", "last");
             var result = await sut.Register("test@xyz.com", "pass1", "name", "last");
@@ -43,7 +45,7 @@ namespace BillTracker.Tests
         [Fact]
         public async Task CantLoginIfUserIsNotRegistered()
         {
-            var sut = new IdentityService(_dbContextMock.Object);
+            var sut = new IdentityService(_dbContextMock.Object, identityConfiguration);
 
             var result = await sut.Login("test@xyz.com", "pass1");
 
@@ -57,7 +59,7 @@ namespace BillTracker.Tests
             const string email = "test@xyz.com";
             const string password = "pass1";
 
-            var sut = new IdentityService(_dbContextMock.Object);
+            var sut = new IdentityService(_dbContextMock.Object, identityConfiguration);
             await sut.Register(email, password, "name", "last");
 
             var result = await sut.Login(email, password);

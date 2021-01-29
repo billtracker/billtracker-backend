@@ -22,10 +22,12 @@ namespace BillTracker.Identity
     {
 
         private readonly BillTrackerContext _context;
+        private readonly IdentityConfiguration _configuration;
 
-        public IdentityService(BillTrackerContext context)
+        public IdentityService(BillTrackerContext context, IdentityConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         public async Task<ResultOrError<JwtTokenResult>> Login(string emailAddress, string password)
@@ -58,12 +60,12 @@ namespace BillTracker.Identity
             return SuccessOrError.FromSuccess();
         }
 
-        private static JwtTokenResult GenerateJwtToken(User user)
+        private JwtTokenResult GenerateJwtToken(User user)
         {
             var validTo = DateTime.UtcNow.AddDays(7); // Finally must be reduced to 1 hour
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("--X BILL TRACKER DEV X--");
+            var key = Encoding.ASCII.GetBytes(_configuration.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
@@ -73,7 +75,7 @@ namespace BillTracker.Identity
                 }),
                 Expires = validTo,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-                Issuer = "https://billtracker/identity",
+                Issuer = _configuration.Issuer,
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var accessToken = tokenHandler.WriteToken(token);
