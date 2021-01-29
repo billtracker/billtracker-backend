@@ -1,16 +1,11 @@
 using System;
-using System.Text;
-using BillTracker.Identity;
+using BillTracker.Api.Modules;
 using BillTracker.Modules;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Serilog;
 
 namespace BillTracker.Api
@@ -31,25 +26,8 @@ namespace BillTracker.Api
 
             services.AddControllers();
 
-            services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opt =>
-                {
-
-                    opt.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
-                            Configuration.GetValue<string>($"{IdentityConfiguration.SectionName}:{nameof(IdentityConfiguration.Secret)}"))),
-                        ValidateIssuer = true,
-                        ValidIssuer = Configuration.GetValue<string>($"{IdentityConfiguration.SectionName}:{nameof(IdentityConfiguration.Issuer)}"),
-                    };
-                });
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BillTracker" });
-            });
+            services.ConfigureAuthentication(Configuration);
+            services.ConfigureSwaggerGen();
 
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
         }
@@ -68,8 +46,8 @@ namespace BillTracker.Api
 
             app.UseRouting();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
