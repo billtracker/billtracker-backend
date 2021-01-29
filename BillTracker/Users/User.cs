@@ -5,23 +5,21 @@ namespace BillTracker.Users
 {
     public class User
     {
-        public static User Create(string firstName, string lastName, string password)
-            => new User(id: Guid.NewGuid(),
-                        firstName: firstName,
-                        lastName: lastName,
-                        password: password,
-                        createdAt: DateTimeOffset.Now);
-
-        public User(Guid id, string firstName, string lastName, string password, DateTimeOffset createdAt)
-        {
-            Id = id;
-            FirstName = firstName;
-            LastName = lastName;
-            Password = password;
-            CreatedAt = createdAt;
-        }
+        public static User Create(string emailAddress, string password, string firstName, string lastName)
+            => new User
+            {
+                Id = Guid.NewGuid(),
+                Password = password,
+                EmailAddress = emailAddress,
+                FirstName = firstName,
+                LastName = lastName,
+                CreatedAt = DateTimeOffset.Now,
+            };
 
         public Guid Id { get; private set; }
+
+        [Required]
+        public string EmailAddress { get; private set; }
 
         [Required]
         public string FirstName { get; private set; }

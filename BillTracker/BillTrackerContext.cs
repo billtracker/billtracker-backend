@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BillTracker
 {
-    public class BillTrackerContext : DbContext
+    internal class BillTrackerContext : DbContext
     {
         public BillTrackerContext(DbContextOptions<BillTrackerContext> options) : base(options) { }
 
