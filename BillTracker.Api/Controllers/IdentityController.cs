@@ -1,5 +1,6 @@
-﻿using System.Threading.Tasks;
-using BillTracker.Api.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using BillTracker.Api.Models.Identity;
 using BillTracker.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -7,8 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BillTracker.Api.Controllers
 {
-    [AllowAnonymous]
-    [Route("user")]
+    [Route("identity")]
     public class IdentityController : ControllerBase
     {
         private readonly IIdentityService _identityService;
@@ -18,7 +18,8 @@ namespace BillTracker.Api.Controllers
             _identityService = identityService;
         }
 
-        [HttpPost("register")]
+        [AllowAnonymous]
+        [HttpPost("user/register")]
         [ProducesResponseType(typeof(LoginRequest), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Register([FromBody] RegisterRequest request)
@@ -38,16 +39,42 @@ namespace BillTracker.Api.Controllers
                 error => BadRequest(error));
         }
 
-        [HttpPost("login")]
-        [ProducesResponseType(typeof(JwtTokenResult), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [AllowAnonymous]
+        [HttpPost("user/login")]
+        [ProducesResponseType(typeof(AuthenticationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult> Login([FromBody] LoginRequest request)
         {
             var result = await _identityService.Login(request.EmailAddress, request.Password);
 
             return result.Match<ActionResult>(
                 success => Ok(success),
-                error => BadRequest(error));
+                error => Unauthorized(error));
+        }
+
+        [HttpPost("token/revoke")]
+        [ProducesResponseType(typeof(AuthenticationResult), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult> RevokeToken([FromBody] RevokeTokenRequest request)
+        {
+            var result = await _identityService.RevokeToken(request.Token);
+
+            return result.Match<ActionResult>(
+                success => NoContent(),
+                error => Unauthorized(error));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("token/refresh")]
+        [ProducesResponseType(typeof(AuthenticationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            var result = await _identityService.RefreshToken(request.Token);
+
+            return result.Match<ActionResult>(
+                success => Ok(success),
+                error => Unauthorized(error));
         }
     }
 }

@@ -9,9 +9,9 @@ namespace BillTracker.Modules
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureBaseServices(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
+        public static IServiceCollection ConfigureBaseServices(this IServiceCollection services, IConfiguration configuration, string environment)
         {
-            services.ConfigureDatabase(configuration, isDevelopment);
+            services.ConfigureDatabase(configuration, environment);
 
             services.AddConfiguration<IdentityConfiguration>(configuration, IdentityConfiguration.SectionName);
 
@@ -20,7 +20,7 @@ namespace BillTracker.Modules
             return services;
         }
 
-        private static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration, bool isDevelopment)
+        private static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration, string environment)
         {
             services
                 .AddDbContext<BillTrackerContext>(opt =>
@@ -30,7 +30,7 @@ namespace BillTracker.Modules
                         builder => builder.EnableRetryOnFailure());
                 }, ServiceLifetime.Transient);
 
-            if (isDevelopment)
+            if (environment != "IntegrationTests" && configuration.GetValue<bool>("MigrateDbOnStartup"))
             {
                 services.BuildServiceProvider().GetService<BillTrackerContext>().Database.Migrate();
             }

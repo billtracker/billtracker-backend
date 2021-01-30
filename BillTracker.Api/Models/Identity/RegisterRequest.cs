@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BillTracker.Api.Models
+namespace BillTracker.Api.Models.Identity
 {
     public class RegisterRequest
     {
