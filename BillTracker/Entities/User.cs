@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BillTracker.Users
+namespace BillTracker.Entities
 {
     public class User
     {
@@ -32,5 +32,7 @@ namespace BillTracker.Users
 
         [Required]
         public DateTimeOffset CreatedAt { get; private set; }
+
+        public RefreshToken RefreshToken { get; private set; }
     }
 }

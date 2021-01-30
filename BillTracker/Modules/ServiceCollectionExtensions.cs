@@ -1,4 +1,5 @@
-﻿using BillTracker.Identity;
+﻿using BillTracker.Entities;
+using BillTracker.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
