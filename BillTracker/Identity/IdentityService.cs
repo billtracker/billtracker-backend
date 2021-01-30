@@ -35,7 +35,6 @@ namespace BillTracker.Identity
         {
             var user = await _context.Users
                 .Include(x => x.RefreshToken)
-                .AsNoTracking()
                 .SingleOrDefaultAsync(x => x.EmailAddress.ToLower() == emailAddress.ToLower());
 
             if (user == null || !new SimpleHash().Verify(password, user.Password))

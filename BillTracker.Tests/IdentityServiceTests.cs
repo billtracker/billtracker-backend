@@ -75,7 +75,7 @@ namespace BillTracker.Tests
         }
 
         [Fact]
-        public async Task CantReuseRefreshToken()
+        public async Task CantReuseRefreshTokenWhenWasUsedToRefresh()
         {
             var email = TestId + "test@xyz.com";
             const string password = "pass1";
@@ -133,6 +133,26 @@ namespace BillTracker.Tests
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(IdentityErrors.InvalidRefreshToken);
+        }
+
+        [Fact]
+        public async Task CantUseRefreshTokenThatWasCreatedBeforeLogin()
+        {
+            var email = TestId + "test@xyz.com";
+            const string password = "pass1";
+
+            using var scope = _factory.Services.CreateScope();
+            var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
+            await sut.Register(email, password, "name", "last");
+
+            var loggedIn = await sut.Login(email, password);
+            loggedIn.IsError.Should().BeFalse();
+            var loggedIn2 = await sut.Login(email, password);
+            loggedIn2.IsError.Should().BeFalse();
+            var refresh = await sut.RefreshToken(loggedIn.Result.RefreshToken);
+
+            refresh.IsError.Should().BeTrue();
+            refresh.Error.Should().Be(IdentityErrors.InvalidRefreshToken);
         }
     }
 }
