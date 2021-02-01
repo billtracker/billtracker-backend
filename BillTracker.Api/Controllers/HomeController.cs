@@ -2,6 +2,7 @@
 
 namespace BillTracker.Api.Controllers
 {
+    [ApiController]
     [Route("home")]
     public class HomeController : ControllerBase
     {

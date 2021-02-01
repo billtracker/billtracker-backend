@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
 using System.Threading.Tasks;
 using BillTracker.Api.Models.Identity;
 using BillTracker.Identity;
@@ -8,9 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BillTracker.Api.Controllers
 {
+    [ApiController]
     [Route("identity")]
     public class IdentityController : ControllerBase
     {
+        private const string CookieRefreshToken = "refresh_token";
+
         private readonly IIdentityService _identityService;
 
         public IdentityController(IIdentityService identityService)
@@ -22,7 +25,7 @@ namespace BillTracker.Api.Controllers
         [HttpPost("user/register")]
         [ProducesResponseType(typeof(LoginRequest), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<ActionResult> Register(RegisterRequest request)
         {
             var result = await _identityService.Register(
                 emailAddress: request.EmailAddress,
@@ -43,21 +46,31 @@ namespace BillTracker.Api.Controllers
         [HttpPost("user/login")]
         [ProducesResponseType(typeof(AuthenticationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> Login([FromBody] LoginRequest request)
+        public async Task<ActionResult> Login(LoginRequest request)
         {
             var result = await _identityService.Login(request.EmailAddress, request.Password);
 
             return result.Match<ActionResult>(
-                success => Ok(success),
+                success =>
+                {
+                    SetCookieRefreshToken(success.RefreshToken);
+                    return Ok(success);
+                },
                 error => Unauthorized(error));
         }
 
         [HttpPost("token/revoke")]
         [ProducesResponseType(typeof(AuthenticationResult), StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> RevokeToken([FromBody] RevokeTokenRequest request)
+        public async Task<ActionResult> RevokeToken()
         {
-            var result = await _identityService.RevokeToken(request.Token);
+            var token = this.Request.Cookies[CookieRefreshToken];
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized($"The '{CookieRefreshToken}' cookie is empty.");
+            }
+
+            var result = await _identityService.RevokeToken(token);
 
             return result.Match<ActionResult>(
                 success => NoContent(),
@@ -68,13 +81,33 @@ namespace BillTracker.Api.Controllers
         [HttpPost("token/refresh")]
         [ProducesResponseType(typeof(AuthenticationResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        public async Task<ActionResult> RefreshToken()
         {
-            var result = await _identityService.RefreshToken(request.Token);
+            var token = this.Request.Cookies[CookieRefreshToken];
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized($"The '{CookieRefreshToken}' cookie is empty.");
+            }
+
+            var result = await _identityService.RefreshToken(token);
 
             return result.Match<ActionResult>(
-                success => Ok(success),
+                success =>
+                {
+                    SetCookieRefreshToken(success.RefreshToken);
+                    return Ok(success);
+                },
                 error => Unauthorized(error));
+        }
+
+        private void SetCookieRefreshToken(string refreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTimeOffset.Now.AddDays(7),
+            };
+            Response.Cookies.Append(CookieRefreshToken, refreshToken, cookieOptions);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace BillTracker.Identity
     {
         Task<ResultOrError<AuthenticationResult>> Login(string emailAddress, string password);
         Task<SuccessOrError> Register(string emailAddress, string password, string firstName, string lastName);
-        Task<ResultOrError<AuthenticationResult>> RefreshToken(string token);
+        Task<ResultOrError<AuthenticationResult>> RefreshToken(string refreshToken);
         Task<SuccessOrError> RevokeToken(string token);
     }
 
