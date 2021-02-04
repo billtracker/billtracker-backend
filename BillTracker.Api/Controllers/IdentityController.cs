@@ -23,9 +23,9 @@ namespace BillTracker.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("user/register")]
-        [ProducesResponseType(typeof(LoginRequest), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Register(RegisterRequest request)
+        public async Task<ActionResult<LoginRequest>> Register(RegisterRequest request)
         {
             var result = await _identityService.Register(
                 emailAddress: request.EmailAddress,
@@ -44,9 +44,9 @@ namespace BillTracker.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("user/login")]
-        [ProducesResponseType(typeof(AuthenticationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> Login(LoginRequest request)
+        public async Task<ActionResult<AuthenticationResult>> Login(LoginRequest request)
         {
             var result = await _identityService.Login(request.EmailAddress, request.Password);
 
@@ -60,9 +60,9 @@ namespace BillTracker.Api.Controllers
         }
 
         [HttpPost("token/revoke")]
-        [ProducesResponseType(typeof(AuthenticationResult), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> RevokeToken()
+        public async Task<ActionResult<AuthenticationResult>> RevokeToken()
         {
             var token = this.Request.Cookies[CookieRefreshToken];
             if (string.IsNullOrEmpty(token))
@@ -79,9 +79,9 @@ namespace BillTracker.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("token/refresh")]
-        [ProducesResponseType(typeof(AuthenticationResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> RefreshToken()
+        public async Task<ActionResult<AuthenticationResult>> RefreshToken()
         {
             var token = this.Request.Cookies[CookieRefreshToken];
             if (string.IsNullOrEmpty(token))

@@ -18,7 +18,9 @@ namespace BillTracker.Modules
             services.AddConfiguration<IdentityConfiguration>(configuration, IdentityConfiguration.SectionName);
 
             services.AddTransient<IIdentityService, IdentityService>();
-            services.AddTransient<IHandle<AddExpenseParameters, ResultOrError<AddExpenseResult>>, AddExpense>();
+            services.AddTransient<IHandle<AddExpenseParameters, ResultOrError<ExpenseModel>>, AddExpense>();
+
+            services.AddTransient<IExpensesQuery, ExpensesQuery>();
 
             return services;
         }
