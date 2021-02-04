@@ -1,5 +1,7 @@
 ﻿using BillTracker.Entities;
+using BillTracker.Expenses;
 using BillTracker.Identity;
+using BillTracker.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,7 @@ namespace BillTracker.Modules
             services.AddConfiguration<IdentityConfiguration>(configuration, IdentityConfiguration.SectionName);
 
             services.AddTransient<IIdentityService, IdentityService>();
+            services.AddTransient<IHandle<AddExpenseParameters, ResultOrError<AddExpenseResult>>, AddExpense>();
 
             return services;
         }
