@@ -12,7 +12,7 @@ namespace BillTracker.Expenses
     {
         Task<ExpenseModel> GetById(Guid id);
 
-        Task<ResultOrError<IEnumerable<ExpenseModel>>> GetByUserId(Guid userId);
+        Task<ResultOrError<IEnumerable<ExpenseModel>>> GetByUserId(Guid userId, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null);
     }
 
     internal class ExpensesQuery : IExpensesQuery
@@ -30,10 +30,9 @@ namespace BillTracker.Expenses
             return result == null ? null : new ExpenseModel(result);
         }
 
-        public async Task<ResultOrError<IEnumerable<ExpenseModel>>> GetByUserId(Guid userId)
+        public async Task<ResultOrError<IEnumerable<ExpenseModel>>> GetByUserId(Guid userId, DateTimeOffset? fromDate, DateTimeOffset? toDate)
         {
             var user = await _context.Users
-                .Include(x => x.Expenses)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(x => x.Id == userId);
             if (user == null)
@@ -41,7 +40,21 @@ namespace BillTracker.Expenses
                 return CommonErrors.UserNotExist;
             }
 
-            var result = user.Expenses.Select(x => new ExpenseModel(x));
+            var baseQuery = _context.Expenses.Where(x => x.AddedById == userId);
+
+            if (fromDate.HasValue)
+            {
+                baseQuery = baseQuery.Where(x => x.AddedAt >= fromDate.Value);
+            }
+
+            if (toDate.HasValue)
+            {
+                baseQuery = baseQuery.Where(x => x.AddedAt <= toDate.Value);
+            }
+
+            var result = await baseQuery
+                .Select(x => new ExpenseModel(x))
+                .ToListAsync();
             return ResultOrError<IEnumerable<ExpenseModel>>.FromResult(result);
         }
     }

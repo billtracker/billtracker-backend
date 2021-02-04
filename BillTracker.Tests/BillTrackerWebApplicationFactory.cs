@@ -42,8 +42,7 @@ namespace BillTracker.Tests
 
         internal async Task<User> CreateUser()
         {
-            using var scope = Factory.Services.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<BillTrackerContext>();
+            var context = Factory.Services.GetRequiredService<BillTrackerContext>();
             var user = User.Create($"{Guid.NewGuid()}-xyz@syz.com", "pass", "Test", "Test");
 
             await context.Users.AddAsync(user);

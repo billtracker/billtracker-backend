@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BillTracker.Expenses
 {
-    internal class AddExpense
-        : IHandle<AddExpenseParameters, ResultOrError<ExpenseModel>>
+    public interface IAddExpense : IHandle<AddExpenseParameters, ResultOrError<ExpenseModel>> { }
+
+    internal class AddExpense : IAddExpense
     {
         private readonly BillTrackerContext _context;
 
