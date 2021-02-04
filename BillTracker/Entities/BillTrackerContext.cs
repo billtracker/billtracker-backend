@@ -8,6 +8,7 @@ namespace BillTracker.Entities
 
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+        public virtual DbSet<Expense> Expenses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,6 +19,13 @@ namespace BillTracker.Entities
                 .HasForeignKey<RefreshToken>(x => x.UserId);
 
                 t.HasAlternateKey(x => x.Token);
+            });
+
+            modelBuilder.Entity<Expense>(e =>
+            {
+                e.HasOne(x => x.AddedBy)
+                .WithMany(x => x.Expenses)
+                .HasForeignKey(x => x.AddedById);
             });
         }
     }

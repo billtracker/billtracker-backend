@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BillTracker.Entities
 {
-    public class User
+    internal class User
     {
         public static User Create(string emailAddress, string password, string firstName, string lastName)
             => new User
@@ -34,5 +35,7 @@ namespace BillTracker.Entities
         public DateTimeOffset CreatedAt { get; private set; }
 
         public RefreshToken RefreshToken { get; private set; }
+
+        public IEnumerable<Expense> Expenses { get; private set; }
     }
 }
