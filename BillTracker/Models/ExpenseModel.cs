@@ -24,9 +24,13 @@ namespace BillTracker.Models
         }
 
         public Guid Id { get; }
+
         public Guid AddedById { get; }
+
         public DateTimeOffset AddedAt { get; }
+
         public string Name { get; }
+
         public decimal Amount { get; }
     }
 }

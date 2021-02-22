@@ -36,7 +36,8 @@ namespace BillTracker.Api.Controllers
             [FromQuery] DateTimeOffset? fromDate,
             [FromQuery] DateTimeOffset? toDate)
         {
-            var result = await _expensesQuery.GetMany(this.GetUserId(),
+            var result = await _expensesQuery.GetMany(
+                this.GetUserId(),
                 pageNumber: pageNumber.Value,
                 pageSize: pageSize.Value,
                 fromDate: fromDate,

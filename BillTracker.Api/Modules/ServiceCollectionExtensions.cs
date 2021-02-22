@@ -44,7 +44,7 @@ namespace BillTracker.Api.Modules
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey,
                     Name = "Authorization",
-                    Scheme = "bearer"
+                    Scheme = "bearer",
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
@@ -54,10 +54,10 @@ namespace BillTracker.Api.Modules
                             Reference = new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
+                                Id = "Bearer",
+                            },
                         }, new List<string>()
-                    }
+                    },
                 });
             });
 

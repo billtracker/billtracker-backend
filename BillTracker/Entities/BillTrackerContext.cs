@@ -4,11 +4,17 @@ namespace BillTracker.Entities
 {
     internal class BillTrackerContext : DbContext
     {
-        public BillTrackerContext(DbContextOptions<BillTrackerContext> options) : base(options) { }
+        public BillTrackerContext(DbContextOptions<BillTrackerContext> options)
+            : base(options)
+        {
+        }
 
         public virtual DbSet<User> Users { get; set; }
+
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
         public virtual DbSet<Expense> Expenses { get; set; }
+
         public virtual DbSet<DashboardCalendarDayView> DashboardCalendarDays { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

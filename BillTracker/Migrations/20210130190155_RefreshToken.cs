@@ -15,7 +15,7 @@ namespace BillTracker.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Token = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    ValidTo = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    ValidTo = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                 },
                 constraints: table =>
                 {

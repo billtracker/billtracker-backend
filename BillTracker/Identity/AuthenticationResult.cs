@@ -12,7 +12,9 @@ namespace BillTracker.Identity
         }
 
         public string AccessToken { get; }
+
         public string RefreshToken { get; }
+
         public DateTimeOffset ExpiresAt { get; }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using BillTracker.Api.Modules;
 using BillTracker.Modules;
 using Microsoft.AspNetCore.Builder;
@@ -21,6 +20,7 @@ namespace BillTracker.Api
         }
 
         public IConfiguration Configuration { get; }
+
         public IWebHostEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.

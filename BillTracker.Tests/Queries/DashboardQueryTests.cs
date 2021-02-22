@@ -63,7 +63,7 @@ namespace BillTracker.Tests.Queries
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<IAddExpense>();
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 10, DateTimeOffset.Now));
-            var mostExpensiveWithinFilter = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 20, DateTimeOffset.Now));
+            await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 20, DateTimeOffset.Now));
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 30, DateTimeOffset.Now.AddDays(2)));
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 40, DateTimeOffset.Now.AddDays(2)));
             var sut = _factory.Services.GetRequiredService<IDashboardQuery>();

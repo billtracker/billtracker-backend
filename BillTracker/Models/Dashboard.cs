@@ -27,7 +27,9 @@ namespace BillTracker.Models
             }
 
             public decimal Total { get; }
+
             public int TotalTransfers { get; }
+
             public ExpenseModel MostExpensive { get; }
         }
 

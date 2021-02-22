@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BillTracker.Shared
+﻿namespace BillTracker.Shared
 {
     public static class CommonErrors
     {

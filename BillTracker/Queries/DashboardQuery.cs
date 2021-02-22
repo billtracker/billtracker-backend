@@ -22,7 +22,7 @@ namespace BillTracker.Queries
             _context = context;
         }
 
-        public async Task<ResultOrError<Dashboard>> GetDashboard(Guid userId, DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        public async Task<ResultOrError<Dashboard>> GetDashboard(Guid userId, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null)
         {
             var userExists = await _context.Users.AnyAsync(x => x.Id == userId);
             if (!userExists)
@@ -45,12 +45,12 @@ namespace BillTracker.Queries
             }
 
             var metrics = await baseQuery
-                .GroupBy(x => x.AddedById,
-                        (key, expenses) => new Dashboard.MetricsModel(
-                            expenses.Sum(x => x.Amount),
-                            expenses.Count(),
-                            new ExpenseModel(baseQuery.OrderByDescending(x => x.Amount).First())
-                 ))
+                .GroupBy(
+                    x => x.AddedById,
+                    (key, expenses) => new Dashboard.MetricsModel(
+                        expenses.Sum(x => x.Amount),
+                        expenses.Count(),
+                        new ExpenseModel(baseQuery.OrderByDescending(x => x.Amount).First())))
                 .SingleOrDefaultAsync();
 
             return new Dashboard(

@@ -37,7 +37,7 @@ namespace BillTracker.Api.Controllers
                 success => CreatedAtAction(nameof(Login), new LoginRequest
                 {
                     EmailAddress = request.EmailAddress,
-                    Password = request.Password
+                    Password = request.Password,
                 }),
                 error => BadRequest(error));
         }

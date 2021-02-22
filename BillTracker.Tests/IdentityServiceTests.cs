@@ -9,9 +9,8 @@ namespace BillTracker.Tests
 {
     public class IdentityServiceTests : IClassFixture<BillTrackerWebApplicationFactory>
     {
+        private static readonly Guid TestId = Guid.NewGuid();
         private readonly BillTrackerWebApplicationFactory _factory;
-
-        private readonly Guid TestId = Guid.NewGuid();
 
         public IdentityServiceTests(BillTrackerWebApplicationFactory factory)
         {

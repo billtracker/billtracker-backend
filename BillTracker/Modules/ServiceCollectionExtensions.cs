@@ -26,24 +26,6 @@ namespace BillTracker.Modules
             return services;
         }
 
-        private static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration, string environment)
-        {
-            services
-                .AddDbContext<BillTrackerContext>(opt =>
-                {
-                    opt.UseNpgsql(
-                        configuration.GetConnectionString("Database"),
-                        builder => builder.EnableRetryOnFailure());
-                }, ServiceLifetime.Transient, ServiceLifetime.Transient);
-
-            if (environment != "IntegrationTests" && configuration.GetValue<bool>("MigrateDbOnStartup"))
-            {
-                services.BuildServiceProvider().GetService<BillTrackerContext>().Database.Migrate();
-            }
-
-            return services;
-        }
-
         public static IServiceCollection AddConfiguration<TConfiguration>(
            this IServiceCollection services,
            IConfiguration configuration,
@@ -59,6 +41,27 @@ namespace BillTracker.Modules
             var config = configuration.GetSection<TConfiguration>(sectionName, optional);
 
             services.TryAddSingleton(config);
+
+            return services;
+        }
+
+        private static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration, string environment)
+        {
+            services
+                .AddDbContext<BillTrackerContext>(
+                    opt =>
+                    {
+                        opt.UseNpgsql(
+                            configuration.GetConnectionString("Database"),
+                            builder => builder.EnableRetryOnFailure());
+                    },
+                    ServiceLifetime.Transient,
+                    ServiceLifetime.Transient);
+
+            if (environment != "IntegrationTests" && configuration.GetValue<bool>("MigrateDbOnStartup"))
+            {
+                services.BuildServiceProvider().GetService<BillTrackerContext>().Database.Migrate();
+            }
 
             return services;
         }

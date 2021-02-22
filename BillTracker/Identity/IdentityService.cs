@@ -15,8 +15,11 @@ namespace BillTracker.Identity
     public interface IIdentityService
     {
         Task<ResultOrError<AuthenticationResult>> Login(string emailAddress, string password);
+
         Task<SuccessOrError> Register(string emailAddress, string password, string firstName, string lastName);
+
         Task<ResultOrError<AuthenticationResult>> RefreshToken(string refreshToken);
+
         Task<SuccessOrError> RevokeToken(string token);
     }
 
@@ -94,11 +97,11 @@ namespace BillTracker.Identity
             return SuccessOrError.FromSuccess();
         }
 
-        public async Task<SuccessOrError> RevokeToken(string refreshToken)
+        public async Task<SuccessOrError> RevokeToken(string token)
         {
             var oldRefreshToken = await _context.RefreshTokens
                 .Include(x => x.User)
-                .SingleOrDefaultAsync(x => x.Token == refreshToken);
+                .SingleOrDefaultAsync(x => x.Token == token);
             if (oldRefreshToken == null)
             {
                 return IdentityErrors.InvalidRefreshToken;

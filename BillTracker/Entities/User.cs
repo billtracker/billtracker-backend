@@ -6,17 +6,6 @@ namespace BillTracker.Entities
 {
     internal class User
     {
-        public static User Create(string emailAddress, string password, string firstName, string lastName)
-            => new User
-            {
-                Id = Guid.NewGuid(),
-                Password = password,
-                EmailAddress = emailAddress,
-                FirstName = firstName,
-                LastName = lastName,
-                CreatedAt = DateTimeOffset.Now,
-            };
-
         public Guid Id { get; private set; }
 
         [Required]
@@ -37,5 +26,16 @@ namespace BillTracker.Entities
         public RefreshToken RefreshToken { get; private set; }
 
         public IEnumerable<Expense> Expenses { get; private set; }
+
+        public static User Create(string emailAddress, string password, string firstName, string lastName)
+            => new User
+            {
+                Id = Guid.NewGuid(),
+                Password = password,
+                EmailAddress = emailAddress,
+                FirstName = firstName,
+                LastName = lastName,
+                CreatedAt = DateTimeOffset.Now,
+            };
     }
 }

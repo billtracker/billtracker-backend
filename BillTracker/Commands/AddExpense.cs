@@ -12,6 +12,25 @@ namespace BillTracker.Commands
         Task<ResultOrError<ExpenseModel>> Handle(AddExpenseParameters input);
     }
 
+    public class AddExpenseParameters
+    {
+        public AddExpenseParameters(Guid userId, string name, decimal amount, DateTimeOffset? addedAt = null)
+        {
+            UserId = userId;
+            Name = name;
+            Amount = amount;
+            AddedAt = addedAt ?? DateTimeOffset.Now;
+        }
+
+        public Guid UserId { get; }
+
+        public string Name { get; }
+
+        public decimal Amount { get; }
+
+        public DateTimeOffset AddedAt { get; }
+    }
+
     internal class AddExpense : IAddExpense
     {
         private readonly BillTrackerContext _context;
@@ -35,21 +54,5 @@ namespace BillTracker.Commands
 
             return new ExpenseModel(expense);
         }
-    }
-
-    public class AddExpenseParameters
-    {
-        public AddExpenseParameters(Guid userId, string name, decimal amount, DateTimeOffset? addedAt = null)
-        {
-            UserId = userId;
-            Name = name;
-            Amount = amount;
-            AddedAt = addedAt ?? DateTimeOffset.Now;
-        }
-
-        public Guid UserId { get; }
-        public string Name { get; }
-        public decimal Amount { get; }
-        public DateTimeOffset AddedAt { get; }
     }
 }
