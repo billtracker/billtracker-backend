@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BillTracker.Entities;
+using BillTracker.Models;
 using BillTracker.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace BillTracker.Expenses
+namespace BillTracker.Queries
 {
     public interface IExpensesQuery
     {
         Task<ExpenseModel> GetById(Guid id);
 
-        Task<ResultOrError<IEnumerable<ExpenseModel>>> GetByUserId(Guid userId, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null);
+        Task<ResultOrError<IEnumerable<ExpenseModel>>> GetMany(Guid userId, int page, int pageSize = 50, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null);
     }
 
     internal class ExpensesQuery : IExpensesQuery
@@ -30,12 +31,10 @@ namespace BillTracker.Expenses
             return result == null ? null : new ExpenseModel(result);
         }
 
-        public async Task<ResultOrError<IEnumerable<ExpenseModel>>> GetByUserId(Guid userId, DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        public async Task<ResultOrError<IEnumerable<ExpenseModel>>> GetMany(Guid userId, int page, int pageSize, DateTimeOffset? fromDate, DateTimeOffset? toDate)
         {
-            var user = await _context.Users
-                .AsNoTracking()
-                .SingleOrDefaultAsync(x => x.Id == userId);
-            if (user == null)
+            var userExists = await _context.Users.AnyAsync(x => x.Id == userId);
+            if (!userExists)
             {
                 return CommonErrors.UserNotExist;
             }

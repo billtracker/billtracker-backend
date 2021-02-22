@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using BillTracker.Expenses;
+using BillTracker.Commands;
+using BillTracker.Queries;
 using BillTracker.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace BillTracker.Tests.Expenses
+namespace BillTracker.Tests.Queries
 {
     public class ExpensesQueryTests : IClassFixture<BillTrackerFixture>
     {
@@ -23,18 +22,18 @@ namespace BillTracker.Tests.Expenses
         }
 
         [Fact]
-        public async Task WhenGetByUserId_GivenNonExistingUser_ThenError()
+        public async Task WhenGetMany_GivenNonExistingUser_ThenError()
         {
             var sut = _factory.Services.GetRequiredService<IExpensesQuery>();
 
-            var result = await sut.GetByUserId(Guid.NewGuid());
+            var result = await sut.GetMany(Guid.NewGuid(), 1);
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(CommonErrors.UserNotExist);
         }
 
         [Fact]
-        public async Task WhenGetByUserId_GivenFilters_ThenReturnsPartOfData()
+        public async Task WhenGetMany_GivenFilters_ThenReturnsPartOfData()
         {
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<IAddExpense>();
@@ -44,7 +43,7 @@ namespace BillTracker.Tests.Expenses
             var expense4 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 18, DateTimeOffset.Now.AddDays(3)));
             var sut = _factory.Services.GetRequiredService<IExpensesQuery>();
 
-            var result = await sut.GetByUserId(user.Id, expense1.Result.AddedAt, expense3.Result.AddedAt);
+            var result = await sut.GetMany(user.Id, 1, fromDate: expense1.Result.AddedAt, toDate: expense3.Result.AddedAt);
 
             result.IsError.Should().BeFalse();
             result.Result.Count().Should().Be(3);
@@ -55,7 +54,7 @@ namespace BillTracker.Tests.Expenses
         }
 
         [Fact]
-        public async Task WhenGetByUserId_GivenNoFilters_ThenReturnsAllExpenses()
+        public async Task WhenGetMany_GivenNoFilters_ThenReturnsAllExpenses()
         {
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<IAddExpense>();
@@ -65,7 +64,7 @@ namespace BillTracker.Tests.Expenses
             var expense4 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 18, DateTimeOffset.Now.AddDays(3)));
             var sut = _factory.Services.GetRequiredService<IExpensesQuery>();
 
-            var result = await sut.GetByUserId(user.Id);
+            var result = await sut.GetMany(user.Id, 1);
 
             result.IsError.Should().BeFalse();
             result.Result.Count().Should().Be(4);

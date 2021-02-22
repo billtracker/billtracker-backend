@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using BillTracker.Expenses;
+using BillTracker.Commands;
 using BillTracker.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace BillTracker.Tests.Expenses
+namespace BillTracker.Tests.Commands
 {
     public class AddExpenseTests : IClassFixture<BillTrackerFixture>
     {

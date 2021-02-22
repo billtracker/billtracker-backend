@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BillTracker.Api.Models.Expenses;
-using BillTracker.Expenses;
+using BillTracker.Api.Models;
+using BillTracker.Commands;
+using BillTracker.Models;
+using BillTracker.Queries;
 using BillTracker.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

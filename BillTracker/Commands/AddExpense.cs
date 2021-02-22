@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BillTracker.Entities;
+using BillTracker.Models;
 using BillTracker.Shared;
 using Microsoft.EntityFrameworkCore;
 
-namespace BillTracker.Expenses
+namespace BillTracker.Commands
 {
-    public interface IAddExpense : IHandle<AddExpenseParameters, ResultOrError<ExpenseModel>> { }
+    public interface IAddExpense : IHandle<AddExpenseParameters, ResultOrError<Models.ExpenseModel>> { }
 
     internal class AddExpense : IAddExpense
     {

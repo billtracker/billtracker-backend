@@ -1,6 +1,7 @@
-﻿using BillTracker.Entities;
-using BillTracker.Expenses;
+﻿using BillTracker.Commands;
+using BillTracker.Entities;
 using BillTracker.Identity;
+using BillTracker.Queries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@ namespace BillTracker.Modules
             services.AddTransient<IAddExpense, AddExpense>();
 
             services.AddTransient<IExpensesQuery, ExpensesQuery>();
+            services.AddTransient<IDashboardQuery, DashboardQuery>();
 
             return services;
         }

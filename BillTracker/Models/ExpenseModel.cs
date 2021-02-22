@@ -1,7 +1,7 @@
 ﻿using System;
 using BillTracker.Entities;
 
-namespace BillTracker.Expenses
+namespace BillTracker.Models
 {
     public class ExpenseModel
     {

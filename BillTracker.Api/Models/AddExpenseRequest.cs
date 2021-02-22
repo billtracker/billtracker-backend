@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace BillTracker.Api.Models.Expenses
+namespace BillTracker.Api.Models
 {
     public class AddExpenseRequest
     {
