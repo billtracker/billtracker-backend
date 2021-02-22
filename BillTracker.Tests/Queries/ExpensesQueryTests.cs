@@ -77,7 +77,7 @@ namespace BillTracker.Tests.Queries
         }
 
         [Fact]
-        public async Task WhenGetMany_GivenPaging_ThenReturnsPartOfData()
+        public async Task WhenGetMany_GivenPaging_ThenReturnsSortedPartOfData()
         {
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<IAddExpense>();
@@ -92,10 +92,10 @@ namespace BillTracker.Tests.Queries
             result.IsError.Should().BeFalse();
             result.Result.TotalItems.Should().Be(4);
             result.Result.Items.Count().Should().Be(2);
-            result.Result.Items.Should().NotContain(x => x.Id == expense1.Result.Id);
-            result.Result.Items.Should().NotContain(x => x.Id == expense2.Result.Id);
-            result.Result.Items.Should().Contain(x => x.Id == expense3.Result.Id);
-            result.Result.Items.Should().Contain(x => x.Id == expense4.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense1.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense2.Result.Id);
+            result.Result.Items.Should().NotContain(x => x.Id == expense3.Result.Id);
+            result.Result.Items.Should().NotContain(x => x.Id == expense4.Result.Id);
         }
     }
 }

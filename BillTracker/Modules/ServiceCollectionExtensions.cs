@@ -34,7 +34,7 @@ namespace BillTracker.Modules
                     opt.UseNpgsql(
                         configuration.GetConnectionString("Database"),
                         builder => builder.EnableRetryOnFailure());
-                }, ServiceLifetime.Transient);
+                }, ServiceLifetime.Transient, ServiceLifetime.Transient);
 
             if (environment != "IntegrationTests" && configuration.GetValue<bool>("MigrateDbOnStartup"))
             {

@@ -5,11 +5,10 @@ namespace BillTracker.Models
 {
     public class Dashboard
     {
-        public static readonly Dashboard Empty = new Dashboard(MetricsModel.Empty);
-
-        public Dashboard(MetricsModel metrics)
+        public Dashboard(MetricsModel metrics, IEnumerable<CalendarDayModel> calendar)
         {
-            Metrics = metrics;
+            Metrics = metrics ?? MetricsModel.Empty;
+            Calendar = calendar;
         }
 
         public MetricsModel Metrics { get; }
@@ -18,7 +17,7 @@ namespace BillTracker.Models
 
         public class MetricsModel
         {
-            public static readonly MetricsModel Empty = new MetricsModel(0, 0, null);
+            internal static readonly MetricsModel Empty = new MetricsModel(0, 0, null);
 
             public MetricsModel(decimal total, int totalTransfers, ExpenseModel mostExpensive)
             {
@@ -34,15 +33,15 @@ namespace BillTracker.Models
 
         public class CalendarDayModel
         {
-            public CalendarDayModel(DateTimeOffset calendarDay, IEnumerable<ExpenseModel> expenses)
+            public CalendarDayModel(DateTime day, decimal total)
             {
-                Day = calendarDay;
-                Expenses = expenses;
+                Day = day;
+                Total = total;
             }
 
-            public DateTimeOffset Day { get; }
+            public DateTime Day { get; }
 
-            public IEnumerable<ExpenseModel> Expenses { get; }
+            public decimal Total { get; }
         }
     }
 }

@@ -32,6 +32,8 @@ namespace BillTracker.Queries
 
             var baseQuery = _context.Expenses.Where(x => x.AddedById == userId);
 
+            var calendar = await _context.DashboardCalendarDays.Where(x => x.AddedById == userId).ToListAsync();
+
             if (fromDate.HasValue)
             {
                 baseQuery = baseQuery.Where(x => x.AddedAt >= fromDate.Value);
@@ -42,18 +44,18 @@ namespace BillTracker.Queries
                 baseQuery = baseQuery.Where(x => x.AddedAt <= toDate.Value);
             }
 
-            var result = await baseQuery
-                .GroupBy(x => x.AddedById)
-                .Select(expenses => new Dashboard(
-                    new Dashboard.MetricsModel(
-                        expenses.Sum(x => x.Amount),
-                        expenses.Count(),
-                        new ExpenseModel(baseQuery.OrderByDescending(x => x.Amount).First())
-                    )
+            var metrics = await baseQuery
+                .GroupBy(x => x.AddedById,
+                        (key, expenses) => new Dashboard.MetricsModel(
+                            expenses.Sum(x => x.Amount),
+                            expenses.Count(),
+                            new ExpenseModel(baseQuery.OrderByDescending(x => x.Amount).First())
                  ))
                 .SingleOrDefaultAsync();
 
-            return result ?? Dashboard.Empty;
+            return new Dashboard(
+                metrics,
+                calendar.Select(x => new Dashboard.CalendarDayModel(x.AddedAt, x.TotalAmount)));
         }
     }
 }
