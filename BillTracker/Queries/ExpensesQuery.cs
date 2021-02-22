@@ -13,7 +13,7 @@ namespace BillTracker.Queries
     {
         Task<ExpenseModel> GetById(Guid id);
 
-        Task<ResultOrError<IEnumerable<ExpenseModel>>> GetMany(Guid userId, int page, int pageSize = 50, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null);
+        Task<ResultOrError<PagedResult<ExpenseModel>>> GetMany(Guid userId, int pageNumber, int pageSize = 50, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null);
     }
 
     internal class ExpensesQuery : IExpensesQuery
@@ -31,7 +31,7 @@ namespace BillTracker.Queries
             return result == null ? null : new ExpenseModel(result);
         }
 
-        public async Task<ResultOrError<IEnumerable<ExpenseModel>>> GetMany(Guid userId, int page, int pageSize, DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        public async Task<ResultOrError<PagedResult<ExpenseModel>>> GetMany(Guid userId, int pageNumber, int pageSize, DateTimeOffset? fromDate, DateTimeOffset? toDate)
         {
             var userExists = await _context.Users.AnyAsync(x => x.Id == userId);
             if (!userExists)
@@ -51,10 +51,16 @@ namespace BillTracker.Queries
                 baseQuery = baseQuery.Where(x => x.AddedAt <= toDate.Value);
             }
 
-            var result = await baseQuery
-                .Select(x => new ExpenseModel(x))
-                .ToListAsync();
-            return ResultOrError<IEnumerable<ExpenseModel>>.FromResult(result);
+            var totalItems = await baseQuery.CountAsync();
+            var items = totalItems == 0
+                ? new List<ExpenseModel>()
+                : await baseQuery.OrderByDescending(x => x.AddedAt)
+                                 .Skip((pageNumber - 1) * pageSize)
+                                 .Take(pageSize)
+                                 .Select(x => new ExpenseModel(x))
+                                 .ToListAsync();
+
+            return ResultOrError<PagedResult<ExpenseModel>>.FromResult(new PagedResult<ExpenseModel>(items, totalItems));
         }
     }
 }

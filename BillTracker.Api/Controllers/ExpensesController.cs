@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using BillTracker.Api.Models;
 using BillTracker.Commands;
@@ -15,15 +16,35 @@ namespace BillTracker.Api.Controllers
     [Route("expenses")]
     public class ExpensesController : ControllerBase
     {
-        private readonly IHandle<AddExpenseParameters, ResultOrError<ExpenseModel>> _addExpenseHandler;
+        private readonly IAddExpense _addExpenseHandler;
         private readonly IExpensesQuery _expensesQuery;
 
         public ExpensesController(
-            IHandle<AddExpenseParameters, ResultOrError<ExpenseModel>> addExpenseHandler,
+            IAddExpense addExpenseHandler,
             IExpensesQuery expensesQuery)
         {
             _addExpenseHandler = addExpenseHandler;
             _expensesQuery = expensesQuery;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<PagedResult<ExpenseModel>>> GetMany(
+            [FromQuery][Required][Range(1, int.MaxValue)] int? pageNumber,
+            [FromQuery][Required][Range(5, 50)] int? pageSize,
+            [FromQuery] DateTimeOffset? fromDate,
+            [FromQuery] DateTimeOffset? toDate)
+        {
+            var result = await _expensesQuery.GetMany(this.GetUserId(),
+                pageNumber: pageNumber.Value,
+                pageSize: pageSize.Value,
+                fromDate: fromDate,
+                toDate: toDate);
+
+            return result.Match<ActionResult>(
+                success => Ok(success),
+                error => BadRequest(error));
         }
 
         [HttpGet]
