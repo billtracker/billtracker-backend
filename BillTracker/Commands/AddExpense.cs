@@ -7,7 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BillTracker.Commands
 {
-    public interface IAddExpense : IHandle<AddExpenseParameters, ResultOrError<ExpenseModel>> { }
+    public interface IAddExpense
+    {
+        Task<ResultOrError<ExpenseModel>> Handle(AddExpenseParameters input);
+    }
 
     internal class AddExpense : IAddExpense
     {
