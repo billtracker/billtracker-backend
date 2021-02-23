@@ -18,10 +18,13 @@ namespace BillTracker.Modules
             services.AddConfiguration<IdentityConfiguration>(configuration, IdentityConfiguration.SectionName);
 
             services.AddTransient<IIdentityService, IdentityService>();
-            services.AddTransient<IAddExpense, AddExpense>();
 
-            services.AddTransient<IExpensesQuery, ExpensesQuery>();
-            services.AddTransient<IDashboardQuery, DashboardQuery>();
+            // Commands
+            services.AddTransient<AddExpense>();
+
+            // Queries
+            services.AddTransient<ExpensesQuery>();
+            services.AddTransient<DashboardQuery>();
 
             return services;
         }

@@ -8,12 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BillTracker.Queries
 {
-    public interface IDashboardQuery
-    {
-        Task<ResultOrError<Dashboard>> GetDashboard(Guid userId, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null);
-    }
-
-    internal class DashboardQuery : IDashboardQuery
+    public class DashboardQuery
     {
         private readonly BillTrackerContext _context;
 

@@ -9,7 +9,7 @@ namespace BillTracker.Tests
 {
     public class IdentityServiceTests : IClassFixture<BillTrackerWebApplicationFactory>
     {
-        private static readonly Guid TestId = Guid.NewGuid();
+        private readonly Guid testId = Guid.NewGuid();
         private readonly BillTrackerWebApplicationFactory _factory;
 
         public IdentityServiceTests(BillTrackerWebApplicationFactory factory)
@@ -23,7 +23,7 @@ namespace BillTracker.Tests
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
 
-            var result = await sut.Register(TestId + "test@xyz.com", "pass1", "name", "last");
+            var result = await sut.Register(testId + "test@xyz.com", "pass1", "name", "last");
 
             result.IsError.Should().BeFalse();
             result.Error.Should().BeNullOrEmpty();
@@ -32,7 +32,7 @@ namespace BillTracker.Tests
         [Fact]
         public async Task CantRegisterIfEmailAddressIsTaken()
         {
-            var email = TestId + "test@xyz.com";
+            var email = testId + "test@xyz.com";
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
 
@@ -49,7 +49,7 @@ namespace BillTracker.Tests
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
 
-            var result = await sut.Login(TestId + "test@xyz.com", "pass1");
+            var result = await sut.Login(testId + "test@xyz.com", "pass1");
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(IdentityErrors.InvalidUser);
@@ -58,7 +58,7 @@ namespace BillTracker.Tests
         [Fact]
         public async Task CanLoginIfParametersAreOk()
         {
-            var email = TestId + "test@xyz.com";
+            var email = testId + "test@xyz.com";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();
@@ -76,7 +76,7 @@ namespace BillTracker.Tests
         [Fact]
         public async Task CantReuseRefreshTokenWhenWasUsedToRefresh()
         {
-            var email = TestId + "test@xyz.com";
+            var email = testId + "test@xyz.com";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();
@@ -99,7 +99,7 @@ namespace BillTracker.Tests
         [Fact]
         public async Task CanRevokeToken()
         {
-            var email = TestId + "test@xyz.com";
+            var email = testId + "test@xyz.com";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();
@@ -117,7 +117,7 @@ namespace BillTracker.Tests
         [Fact]
         public async Task CantRevokeTokenIfNotExist()
         {
-            var email = TestId + "test@xyz.com";
+            var email = testId + "test@xyz.com";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();
@@ -137,7 +137,7 @@ namespace BillTracker.Tests
         [Fact]
         public async Task CantUseRefreshTokenThatWasCreatedBeforeLogin()
         {
-            var email = TestId + "test@xyz.com";
+            var email = testId + "test@xyz.com";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();

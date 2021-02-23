@@ -23,7 +23,7 @@ namespace BillTracker.Tests.Commands
         public async Task UserWhoNotExistCannotAddExpense()
         {
             using var scope = _factory.Services.CreateScope();
-            var sut = scope.ServiceProvider.GetRequiredService<IAddExpense>();
+            var sut = scope.ServiceProvider.GetRequiredService<AddExpense>();
 
             var result = await sut.Handle(new AddExpenseParameters(Guid.NewGuid(), "name", 20));
 
@@ -36,7 +36,7 @@ namespace BillTracker.Tests.Commands
         {
             var user = await _fixture.CreateUser();
             using var scope = _factory.Services.CreateScope();
-            var sut = scope.ServiceProvider.GetRequiredService<IAddExpense>();
+            var sut = scope.ServiceProvider.GetRequiredService<AddExpense>();
 
             var result = await sut.Handle(new AddExpenseParameters(user.Id, "name", 20));
 

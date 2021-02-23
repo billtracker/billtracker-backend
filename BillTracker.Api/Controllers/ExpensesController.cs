@@ -16,12 +16,12 @@ namespace BillTracker.Api.Controllers
     [Route("expenses")]
     public class ExpensesController : ControllerBase
     {
-        private readonly IAddExpense _addExpenseHandler;
-        private readonly IExpensesQuery _expensesQuery;
+        private readonly AddExpense _addExpenseHandler;
+        private readonly ExpensesQuery _expensesQuery;
 
         public ExpensesController(
-            IAddExpense addExpenseHandler,
-            IExpensesQuery expensesQuery)
+            AddExpense addExpenseHandler,
+            ExpensesQuery expensesQuery)
         {
             _addExpenseHandler = addExpenseHandler;
             _expensesQuery = expensesQuery;

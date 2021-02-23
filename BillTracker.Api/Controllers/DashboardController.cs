@@ -12,9 +12,9 @@ namespace BillTracker.Api.Controllers
     [Route("dashboard")]
     public class DashboardController : ControllerBase
     {
-        private readonly IDashboardQuery _query;
+        private readonly DashboardQuery _query;
 
-        public DashboardController(IDashboardQuery query)
+        public DashboardController(DashboardQuery query)
         {
             _query = query;
         }

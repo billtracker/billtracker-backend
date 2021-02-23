@@ -113,6 +113,16 @@ namespace BillTracker.Identity
             return SuccessOrError.FromSuccess();
         }
 
+        private static RefreshToken GenerateRefreshToken(Guid userId)
+        {
+            using var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+
+            var randomBytes = new byte[64];
+            rngCryptoServiceProvider.GetBytes(randomBytes);
+
+            return Entities.RefreshToken.Create(userId, Convert.ToBase64String(randomBytes));
+        }
+
         private (string AccessToken, DateTimeOffset ExpiresAt) GenerateJwtToken(User user)
         {
             var key = Encoding.ASCII.GetBytes(_configuration.Secret);
@@ -133,16 +143,6 @@ namespace BillTracker.Identity
                 });
 
             return (accessToken, expiresIn);
-        }
-
-        private RefreshToken GenerateRefreshToken(Guid userId)
-        {
-            using var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
-
-            var randomBytes = new byte[64];
-            rngCryptoServiceProvider.GetBytes(randomBytes);
-
-            return Entities.RefreshToken.Create(userId, Convert.ToBase64String(randomBytes));
         }
     }
 }

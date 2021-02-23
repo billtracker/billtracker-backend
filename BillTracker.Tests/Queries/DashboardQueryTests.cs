@@ -23,12 +23,12 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGet_GivenNoFilters_ThenReturnsFromAllPeriod()
         {
             var user = await _fixture.CreateUser();
-            var addExpenseService = _factory.Services.GetRequiredService<IAddExpense>();
+            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 10, DateTimeOffset.Now));
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 20, DateTimeOffset.Now.AddDays(1)));
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 30, DateTimeOffset.Now.AddDays(2)));
             var mostExpensive = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 40, DateTimeOffset.Now.AddDays(3)));
-            var sut = _factory.Services.GetRequiredService<IDashboardQuery>();
+            var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(user.Id);
 
@@ -42,12 +42,12 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGet_GivenDateFilters_ThenReturnsFiltered()
         {
             var user = await _fixture.CreateUser();
-            var addExpenseService = _factory.Services.GetRequiredService<IAddExpense>();
+            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 10, DateTimeOffset.Now));
             var mostExpensiveWithinFilter = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 20, DateTimeOffset.Now.AddDays(1)));
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 30, DateTimeOffset.Now.AddDays(2)));
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 40, DateTimeOffset.Now.AddDays(3)));
-            var sut = _factory.Services.GetRequiredService<IDashboardQuery>();
+            var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(user.Id, DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddDays(1));
 
@@ -61,12 +61,12 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGet_ThenReturnsCalendarDays()
         {
             var user = await _fixture.CreateUser();
-            var addExpenseService = _factory.Services.GetRequiredService<IAddExpense>();
+            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 10, DateTimeOffset.Now));
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 20, DateTimeOffset.Now));
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 30, DateTimeOffset.Now.AddDays(2)));
             await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 40, DateTimeOffset.Now.AddDays(2)));
-            var sut = _factory.Services.GetRequiredService<IDashboardQuery>();
+            var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(user.Id);
 
@@ -80,7 +80,7 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGet_GivenUserWithoutExpenses_ThenReturnsEmpty()
         {
             var user = await _fixture.CreateUser();
-            var sut = _factory.Services.GetRequiredService<IDashboardQuery>();
+            var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(user.Id);
 

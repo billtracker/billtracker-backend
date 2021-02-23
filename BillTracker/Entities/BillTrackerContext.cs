@@ -2,43 +2,44 @@
 
 namespace BillTracker.Entities
 {
-    internal class BillTrackerContext : DbContext
+    public class BillTrackerContext : DbContext
     {
         public BillTrackerContext(DbContextOptions<BillTrackerContext> options)
             : base(options)
         {
         }
 
-        public virtual DbSet<User> Users { get; set; }
+        internal virtual DbSet<User> Users { get; set; }
 
-        public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+        internal virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        public virtual DbSet<Expense> Expenses { get; set; }
+        internal virtual DbSet<Expense> Expenses { get; set; }
 
-        public virtual DbSet<DashboardCalendarDayView> DashboardCalendarDays { get; set; }
+        internal virtual DbSet<DashboardCalendarDayView> DashboardCalendarDays { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<RefreshToken>(t =>
+            modelBuilder.Entity<RefreshToken>(token =>
             {
-                t.HasOne(p => p.User)
-                .WithOne(u => u.RefreshToken)
-                .HasForeignKey<RefreshToken>(x => x.UserId);
+                token.HasOne(p => p.User)
+                     .WithOne(u => u.RefreshToken)
+                     .HasForeignKey<RefreshToken>(x => x.UserId);
 
-                t.HasAlternateKey(x => x.Token);
+                token.HasAlternateKey(x => x.Token);
             });
 
-            modelBuilder.Entity<Expense>(e =>
+            modelBuilder.Entity<Expense>(expense =>
             {
-                e.HasOne(x => x.AddedBy)
-                .WithMany(x => x.Expenses)
-                .HasForeignKey(x => x.AddedById);
+                expense.HasOne(x => x.AddedBy)
+                       .WithMany(x => x.Expenses)
+                       .HasForeignKey(x => x.AddedById);
             });
 
-            modelBuilder.Entity<DashboardCalendarDayView>(x =>
+            modelBuilder.Entity<DashboardCalendarDayView>(calendarDay =>
             {
-                x.HasNoKey();
-                x.ToSqlQuery($@"
+                calendarDay.HasNoKey()
+                           .ToView(null)
+                           .ToSqlQuery($@"
 SELECT
     ""{nameof(Expense.AddedById)}"" AS ""{nameof(DashboardCalendarDayView.AddedById)}"",
     SUM(""{nameof(Expense.Amount)}"") AS ""{nameof(DashboardCalendarDayView.TotalAmount)}"",

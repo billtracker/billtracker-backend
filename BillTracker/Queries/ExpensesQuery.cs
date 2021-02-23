@@ -9,14 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BillTracker.Queries
 {
-    public interface IExpensesQuery
-    {
-        Task<ExpenseModel> GetById(Guid id);
-
-        Task<ResultOrError<PagedResult<ExpenseModel>>> GetMany(Guid userId, int pageNumber, int pageSize = 50, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null);
-    }
-
-    internal class ExpensesQuery : IExpensesQuery
+    public class ExpensesQuery
     {
         private readonly BillTrackerContext _context;
 

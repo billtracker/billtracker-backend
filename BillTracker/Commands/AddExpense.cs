@@ -7,11 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BillTracker.Commands
 {
-    public interface IAddExpense
-    {
-        Task<ResultOrError<ExpenseModel>> Handle(AddExpenseParameters input);
-    }
-
     public class AddExpenseParameters
     {
         public AddExpenseParameters(Guid userId, string name, decimal amount, DateTimeOffset? addedAt = null)
@@ -31,7 +26,7 @@ namespace BillTracker.Commands
         public DateTimeOffset AddedAt { get; }
     }
 
-    internal class AddExpense : IAddExpense
+    public class AddExpense
     {
         private readonly BillTrackerContext _context;
 
