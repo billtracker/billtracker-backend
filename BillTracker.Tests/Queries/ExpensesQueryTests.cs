@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BillTracker.Commands;
+using BillTracker.Entities;
 using BillTracker.Queries;
 using BillTracker.Shared;
 using FluentAssertions;
@@ -35,23 +36,24 @@ namespace BillTracker.Tests.Queries
         [Fact]
         public async Task WhenGetMany_GivenFilters_ThenReturnsPartOfData()
         {
+            var initDate = DateTimeOffset.Now;
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 15, DateTimeOffset.Now));
-            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 16, DateTimeOffset.Now.AddDays(1)));
-            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 17, DateTimeOffset.Now.AddDays(2)));
-            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 18, DateTimeOffset.Now.AddDays(3)));
+            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 15, BuiltInExpenseTypes.Food.Id, addedDate: initDate));
+            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 16, BuiltInExpenseTypes.Food.Id, addedDate: initDate.AddDays(1)));
+            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 17, BuiltInExpenseTypes.Food.Id, addedDate: initDate.AddDays(2)));
+            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 18, BuiltInExpenseTypes.Food.Id, addedDate: initDate.AddDays(3)));
             var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
 
-            var result = await sut.GetMany(user.Id, 1, fromDate: expense1.Result.AddedAt, toDate: expense3.Result.AddedAt);
+            var result = await sut.GetMany(user.Id, 1, fromDate: initDate, toDate: initDate.AddDays(2));
 
             result.IsError.Should().BeFalse();
             result.Result.TotalItems.Should().Be(3);
             result.Result.Items.Count().Should().Be(3);
-            result.Result.Items.Should().Contain(x => x.Id == expense1.Result.Id);
-            result.Result.Items.Should().Contain(x => x.Id == expense2.Result.Id);
-            result.Result.Items.Should().Contain(x => x.Id == expense3.Result.Id);
-            result.Result.Items.Should().NotContain(x => x.Id == expense4.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense1.Result);
+            result.Result.Items.Should().Contain(x => x.Id == expense2.Result);
+            result.Result.Items.Should().Contain(x => x.Id == expense3.Result);
+            result.Result.Items.Should().NotContain(x => x.Id == expense4.Result);
         }
 
         [Fact]
@@ -59,10 +61,10 @@ namespace BillTracker.Tests.Queries
         {
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 15, DateTimeOffset.Now));
-            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 16, DateTimeOffset.Now.AddDays(1)));
-            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 17, DateTimeOffset.Now.AddDays(2)));
-            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 18, DateTimeOffset.Now.AddDays(3)));
+            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 15, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now));
+            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 16, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
+            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 17, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
+            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 18, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
             var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.GetMany(user.Id, 1);
@@ -70,10 +72,10 @@ namespace BillTracker.Tests.Queries
             result.IsError.Should().BeFalse();
             result.Result.TotalItems.Should().Be(4);
             result.Result.Items.Count().Should().Be(4);
-            result.Result.Items.Should().Contain(x => x.Id == expense1.Result.Id);
-            result.Result.Items.Should().Contain(x => x.Id == expense2.Result.Id);
-            result.Result.Items.Should().Contain(x => x.Id == expense3.Result.Id);
-            result.Result.Items.Should().Contain(x => x.Id == expense4.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense1.Result);
+            result.Result.Items.Should().Contain(x => x.Id == expense2.Result);
+            result.Result.Items.Should().Contain(x => x.Id == expense3.Result);
+            result.Result.Items.Should().Contain(x => x.Id == expense4.Result);
         }
 
         [Fact]
@@ -81,10 +83,10 @@ namespace BillTracker.Tests.Queries
         {
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 15, DateTimeOffset.Now));
-            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 16, DateTimeOffset.Now.AddDays(1)));
-            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 17, DateTimeOffset.Now.AddDays(2)));
-            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 18, DateTimeOffset.Now.AddDays(3)));
+            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 15, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now));
+            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 16, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
+            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 17, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
+            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 18, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
             var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.GetMany(user.Id, 2, 2);
@@ -92,10 +94,10 @@ namespace BillTracker.Tests.Queries
             result.IsError.Should().BeFalse();
             result.Result.TotalItems.Should().Be(4);
             result.Result.Items.Count().Should().Be(2);
-            result.Result.Items.Should().Contain(x => x.Id == expense1.Result.Id);
-            result.Result.Items.Should().Contain(x => x.Id == expense2.Result.Id);
-            result.Result.Items.Should().NotContain(x => x.Id == expense3.Result.Id);
-            result.Result.Items.Should().NotContain(x => x.Id == expense4.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense1.Result);
+            result.Result.Items.Should().Contain(x => x.Id == expense2.Result);
+            result.Result.Items.Should().NotContain(x => x.Id == expense3.Result);
+            result.Result.Items.Should().NotContain(x => x.Id == expense4.Result);
         }
     }
 }

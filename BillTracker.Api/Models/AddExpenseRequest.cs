@@ -10,6 +10,9 @@ namespace BillTracker.Api.Models
 
         public decimal Amount { get; set; }
 
-        public DateTimeOffset? AddedAt { get; set; }
+        public DateTimeOffset? AddedDate { get; set; }
+
+        [Required]
+        public Guid? ExpenseTypeId { get; set; }
     }
 }

@@ -5,22 +5,16 @@ namespace BillTracker.Models
 {
     public class ExpenseModel
     {
-        public ExpenseModel(Guid id, Guid addedById, DateTimeOffset addedAt, string name, decimal amount)
-        {
-            Id = id;
-            AddedById = addedById;
-            AddedAt = addedAt;
-            Name = name;
-            Amount = amount;
-        }
-
         internal ExpenseModel(Expense expense)
         {
             Id = expense.Id;
-            AddedById = expense.AddedById;
-            AddedAt = expense.AddedAt;
+            AddedById = expense.UserId;
+            AddedAt = expense.AddedDate;
             Name = expense.Name;
             Amount = expense.Amount;
+
+            ExpenseTypeId = expense.ExpenseTypeId;
+            ExpenseTypeName = expense.ExpenseType.Name;
         }
 
         public Guid Id { get; }
@@ -32,5 +26,9 @@ namespace BillTracker.Models
         public string Name { get; }
 
         public decimal Amount { get; }
+
+        public Guid ExpenseTypeId { get; }
+
+        public string ExpenseTypeName { get; }
     }
 }

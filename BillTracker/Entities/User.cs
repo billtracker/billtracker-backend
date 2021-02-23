@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BillTracker.Entities
 {
-    internal class User
+    internal class User : IEntity
     {
         public Guid Id { get; private set; }
 

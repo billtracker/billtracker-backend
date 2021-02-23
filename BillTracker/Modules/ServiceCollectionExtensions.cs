@@ -21,6 +21,7 @@ namespace BillTracker.Modules
 
             // Commands
             services.AddTransient<AddExpense>();
+            services.AddTransient<CreateExpenseType>();
 
             // Queries
             services.AddTransient<ExpensesQuery>();

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BillTracker.Entities;
 using BillTracker.Models;
 using BillTracker.Shared;
 using Microsoft.EntityFrameworkCore;
+using static BillTracker.Models.Dashboard;
 
 namespace BillTracker.Queries
 {
@@ -25,32 +27,64 @@ namespace BillTracker.Queries
                 return CommonErrors.UserNotExist;
             }
 
-            var baseQuery = _context.Expenses.Where(x => x.AddedById == userId);
+            var baseQuery = _context.Expenses.Where(
+                x => x.UserId == userId &&
+                     (!fromDate.HasValue || x.AddedDate >= fromDate.Value) &&
+                     (!toDate.HasValue || x.AddedDate <= toDate.Value));
 
-            var calendar = await _context.DashboardCalendarDays.Where(x => x.AddedById == userId).ToListAsync();
+            var metrics = await GetMetrics(baseQuery);
+            var calendar = await GetCalendar(userId);
+            var expenseTypes = await GetExpenseTypes(baseQuery);
 
-            if (fromDate.HasValue)
-            {
-                baseQuery = baseQuery.Where(x => x.AddedAt >= fromDate.Value);
-            }
+            return new Dashboard(metrics, calendar, expenseTypes);
+        }
 
-            if (toDate.HasValue)
-            {
-                baseQuery = baseQuery.Where(x => x.AddedAt <= toDate.Value);
-            }
+        private static async Task<MetricsModel> GetMetrics(IQueryable<Expense> baseQuery)
+        {
+            var mostExpensive = await baseQuery
+                .Include(x => x.ExpenseType)
+                .OrderByDescending(x => x.Amount)
+                .Select(x => new ExpenseModel(x))
+                .FirstOrDefaultAsync();
 
-            var metrics = await baseQuery
+            var stats = await baseQuery
                 .GroupBy(
-                    x => x.AddedById,
-                    (key, expenses) => new Dashboard.MetricsModel(
-                        expenses.Sum(x => x.Amount),
-                        expenses.Count(),
-                        new ExpenseModel(baseQuery.OrderByDescending(x => x.Amount).First())))
-                .SingleOrDefaultAsync();
+                    x => x.UserId,
+                    (key, expenses) => new
+                    {
+                        Total = expenses.Sum(x => x.Amount),
+                        Transfers = expenses.Count(),
+                    }).SingleOrDefaultAsync();
 
-            return new Dashboard(
-                metrics,
-                calendar.Select(x => new Dashboard.CalendarDayModel(x.AddedAt, x.TotalAmount)));
+            return new MetricsModel(
+                total: stats?.Total ?? default,
+                transfers: stats?.Transfers ?? default,
+                mostExpensive: mostExpensive);
+        }
+
+        private static async Task<IReadOnlyList<DashboardExpenseTypeModel>> GetExpenseTypes(IQueryable<Expense> baseQuery)
+        {
+            var result = await baseQuery
+                .Include(x => x.ExpenseType)
+                .GroupBy(
+                    x => new { Id = x.ExpenseTypeId, x.ExpenseType.Name },
+                    (key, types) => new DashboardExpenseTypeModel(
+                        key.Id,
+                        key.Name,
+                        types.Sum(x => x.Amount)))
+                .ToListAsync();
+
+            return result;
+        }
+
+        private async Task<IReadOnlyList<CalendarDayModel>> GetCalendar(Guid userId)
+        {
+            var result = await _context.DashboardCalendarDays
+                .Where(x => x.AddedById == userId)
+                .Select(x => new CalendarDayModel(x.AddedAt, x.TotalAmount))
+                .ToListAsync();
+
+            return result;
         }
     }
 }

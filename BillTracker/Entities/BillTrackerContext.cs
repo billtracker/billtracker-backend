@@ -15,6 +15,8 @@ namespace BillTracker.Entities
 
         internal virtual DbSet<Expense> Expenses { get; set; }
 
+        internal virtual DbSet<ExpenseType> ExpenseTypes { get; set; }
+
         internal virtual DbSet<DashboardCalendarDayView> DashboardCalendarDays { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,24 +32,32 @@ namespace BillTracker.Entities
 
             modelBuilder.Entity<Expense>(expense =>
             {
-                expense.HasOne(x => x.AddedBy)
+                expense.HasOne(x => x.User)
                        .WithMany(x => x.Expenses)
-                       .HasForeignKey(x => x.AddedById);
+                       .HasForeignKey(x => x.UserId);
+            });
+
+            modelBuilder.Entity<ExpenseType>(type =>
+            {
+                type.HasMany(x => x.Expenses)
+                    .WithOne(x => x.ExpenseType)
+                    .HasForeignKey(x => x.ExpenseTypeId);
             });
 
             modelBuilder.Entity<DashboardCalendarDayView>(calendarDay =>
             {
+                // Created raw sql just becausee DateTimeOffset is not translatable yet.
                 calendarDay.HasNoKey()
                            .ToView(null)
                            .ToSqlQuery($@"
 SELECT
-    ""{nameof(Expense.AddedById)}"" AS ""{nameof(DashboardCalendarDayView.AddedById)}"",
+    ""{nameof(Expense.UserId)}"" AS ""{nameof(DashboardCalendarDayView.AddedById)}"",
     SUM(""{nameof(Expense.Amount)}"") AS ""{nameof(DashboardCalendarDayView.TotalAmount)}"",
-    ""{nameof(Expense.AddedAt)}""::DATE AS ""{nameof(DashboardCalendarDayView.AddedAt)}""
+    ""{nameof(Expense.AddedDate)}""::DATE AS ""{nameof(DashboardCalendarDayView.AddedAt)}""
 FROM ""{nameof(Expenses)}""
 GROUP BY 
-    ""{nameof(Expense.AddedById)}"",
-    ""{nameof(Expense.AddedAt)}""::DATE");
+    ""{nameof(Expense.UserId)}"",
+    ""{nameof(Expense.AddedDate)}""::DATE");
             });
         }
     }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BillTracker.Entities
 {
-    internal class RefreshToken
+    internal class RefreshToken : IEntity
     {
         public Guid Id { get; private set; }
 

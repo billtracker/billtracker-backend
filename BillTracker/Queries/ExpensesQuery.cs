@@ -32,22 +32,22 @@ namespace BillTracker.Queries
                 return CommonErrors.UserNotExist;
             }
 
-            var baseQuery = _context.Expenses.Where(x => x.AddedById == userId);
+            var baseQuery = _context.Expenses.Include(x => x.ExpenseType).Where(x => x.UserId == userId);
 
             if (fromDate.HasValue)
             {
-                baseQuery = baseQuery.Where(x => x.AddedAt >= fromDate.Value);
+                baseQuery = baseQuery.Where(x => x.AddedDate >= fromDate.Value);
             }
 
             if (toDate.HasValue)
             {
-                baseQuery = baseQuery.Where(x => x.AddedAt <= toDate.Value);
+                baseQuery = baseQuery.Where(x => x.AddedDate <= toDate.Value);
             }
 
             var totalItems = await baseQuery.CountAsync();
             var items = totalItems == 0
                 ? new List<ExpenseModel>()
-                : await baseQuery.OrderByDescending(x => x.AddedAt)
+                : await baseQuery.OrderByDescending(x => x.AddedDate)
                                  .Skip((pageNumber - 1) * pageSize)
                                  .Take(pageSize)
                                  .Select(x => new ExpenseModel(x))

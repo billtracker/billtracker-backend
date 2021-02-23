@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BillTracker.Commands;
+using BillTracker.Entities;
 using BillTracker.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +26,7 @@ namespace BillTracker.Tests.Commands
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<AddExpense>();
 
-            var result = await sut.Handle(new AddExpenseParameters(Guid.NewGuid(), "name", 20));
+            var result = await sut.Handle(new AddExpenseParameters(Guid.NewGuid(), "name", 20, BuiltInExpenseTypes.Food.Id));
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(CommonErrors.UserNotExist);
@@ -38,7 +39,7 @@ namespace BillTracker.Tests.Commands
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<AddExpense>();
 
-            var result = await sut.Handle(new AddExpenseParameters(user.Id, "name", 20));
+            var result = await sut.Handle(new AddExpenseParameters(user.Id, "name", 20, BuiltInExpenseTypes.Food.Id));
 
             result.IsError.Should().BeFalse();
         }

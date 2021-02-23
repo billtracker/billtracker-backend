@@ -70,10 +70,10 @@ namespace BillTracker.Api.Controllers
         public async Task<ActionResult<IEnumerable<ExpenseModel>>> Post(AddExpenseRequest request)
         {
             var result = await _addExpenseHandler.Handle(
-                new AddExpenseParameters(this.GetUserId(), request.Name, request.Amount, request.AddedAt));
+                new AddExpenseParameters(this.GetUserId(), request.Name, request.Amount, request.ExpenseTypeId.Value, request.AddedDate));
 
             return result.Match<ActionResult>(
-                success => CreatedAtAction(nameof(Get), new { id = result.Result.Id }, result.Result),
+                success => CreatedAtAction(nameof(Get), new { id = result.Result }, result.Result),
                 error => BadRequest(error));
         }
     }
