@@ -21,7 +21,7 @@ namespace BillTracker.Tests.Queries
         }
 
         [Fact]
-        public async Task WhenGet_GivenNoFilters_ThenReturnsFromAllPeriod()
+        public async Task WhenGet_GivenNoFilters_ThenReturnsMetricsFromAllPeriod()
         {
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
@@ -40,7 +40,26 @@ namespace BillTracker.Tests.Queries
         }
 
         [Fact]
-        public async Task WhenGet_GivenDateFilters_ThenReturnsFiltered()
+        public async Task WhenGet_GivenNoFilters_ThenReturnsExpenseTypesFromAllPeriod()
+        {
+            var user = await _fixture.CreateUser();
+            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
+            await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 10, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now));
+            await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 20, BuiltInExpenseTypes.Food.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
+            await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 30, BuiltInExpenseTypes.Gas.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
+            await addExpenseService.Handle(new AddExpenseParameters(user.Id, "name", 40, BuiltInExpenseTypes.Gas.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
+            var sut = _factory.Services.GetRequiredService<DashboardQuery>();
+
+            var dashboard = await sut.GetDashboard(user.Id, DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddDays(2));
+
+            dashboard.IsError.Should().BeFalse();
+            dashboard.Result.ExpenseTypes.Should().HaveCount(2);
+            dashboard.Result.ExpenseTypes.Should().Contain(x => x.ExpenseTypeId == BuiltInExpenseTypes.Food.Id && x.Total == 30);
+            dashboard.Result.ExpenseTypes.Should().Contain(x => x.ExpenseTypeId == BuiltInExpenseTypes.Gas.Id && x.Total == 30);
+        }
+
+        [Fact]
+        public async Task WhenGet_GivenDateFilters_ThenReturnsFilteredMetrics()
         {
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
@@ -78,7 +97,7 @@ namespace BillTracker.Tests.Queries
         }
 
         [Fact]
-        public async Task WhenGet_ThenReturnsExpenseTypes()
+        public async Task WhenGet_GivenDateFilters_ThenReturnsFilteredExpenseTypes()
         {
             var user = await _fixture.CreateUser();
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();

@@ -10,7 +10,7 @@ namespace BillTracker.Models
             IReadOnlyList<CalendarDayModel> calendar,
             IReadOnlyList<DashboardExpenseTypeModel> expenseTypes)
         {
-            Metrics = metrics ?? MetricsModel.Empty;
+            Metrics = metrics;
             Calendar = calendar;
             ExpenseTypes = expenseTypes;
         }
@@ -23,8 +23,6 @@ namespace BillTracker.Models
 
         public class MetricsModel
         {
-            internal static readonly MetricsModel Empty = new MetricsModel(0, 0, null);
-
             public MetricsModel(decimal total, int transfers, ExpenseModel mostExpensive)
             {
                 Total = total;

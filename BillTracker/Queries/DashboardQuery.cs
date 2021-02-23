@@ -27,45 +27,38 @@ namespace BillTracker.Queries
                 return CommonErrors.UserNotExist;
             }
 
-            var baseQuery = _context.Expenses.Where(
-                x => x.UserId == userId &&
-                     (!fromDate.HasValue || x.AddedDate >= fromDate.Value) &&
-                     (!toDate.HasValue || x.AddedDate <= toDate.Value));
-
-            var metrics = await GetMetrics(baseQuery);
+            var stats = await GetStatisticsFilteredByDate(userId, fromDate, toDate);
             var calendar = await GetCalendar(userId);
-            var expenseTypes = await GetExpenseTypes(baseQuery);
 
-            return new Dashboard(metrics, calendar, expenseTypes);
+            return new Dashboard(stats.Metrics, calendar, stats.ExpenseTypes);
         }
 
         private static async Task<MetricsModel> GetMetrics(IQueryable<Expense> baseQuery)
         {
             var mostExpensive = await baseQuery
-                .Include(x => x.ExpenseType)
                 .OrderByDescending(x => x.Amount)
                 .Select(x => new ExpenseModel(x))
                 .FirstOrDefaultAsync();
 
-            var stats = await baseQuery
+            var peakStats = await baseQuery
                 .GroupBy(
                     x => x.UserId,
                     (key, expenses) => new
                     {
                         Total = expenses.Sum(x => x.Amount),
                         Transfers = expenses.Count(),
-                    }).SingleOrDefaultAsync();
+                    })
+                .SingleOrDefaultAsync();
 
             return new MetricsModel(
-                total: stats?.Total ?? default,
-                transfers: stats?.Transfers ?? default,
+                total: peakStats?.Total ?? default,
+                transfers: peakStats?.Transfers ?? default,
                 mostExpensive: mostExpensive);
         }
 
         private static async Task<IReadOnlyList<DashboardExpenseTypeModel>> GetExpenseTypes(IQueryable<Expense> baseQuery)
         {
             var result = await baseQuery
-                .Include(x => x.ExpenseType)
                 .GroupBy(
                     x => new { Id = x.ExpenseTypeId, x.ExpenseType.Name },
                     (key, types) => new DashboardExpenseTypeModel(
@@ -75,6 +68,22 @@ namespace BillTracker.Queries
                 .ToListAsync();
 
             return result;
+        }
+
+        private async Task<(MetricsModel Metrics, IReadOnlyList<DashboardExpenseTypeModel> ExpenseTypes)> GetStatisticsFilteredByDate(
+            Guid userId, DateTimeOffset? fromDate, DateTimeOffset? toDate)
+        {
+            var baseQuery = _context.Expenses
+                .Include(x => x.ExpenseType)
+                .Where(
+                    x => x.UserId == userId &&
+                         (!fromDate.HasValue || x.AddedDate >= fromDate.Value) &&
+                         (!toDate.HasValue || x.AddedDate <= toDate.Value));
+
+            var metrics = await GetMetrics(baseQuery);
+            var expenseTypes = await GetExpenseTypes(baseQuery);
+
+            return (metrics, expenseTypes);
         }
 
         private async Task<IReadOnlyList<CalendarDayModel>> GetCalendar(Guid userId)
