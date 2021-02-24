@@ -26,8 +26,7 @@ namespace BillTracker.Queries
 
         public async Task<ResultOrError<PagedResult<ExpenseModel>>> GetMany(Guid userId, int pageNumber, int pageSize = 50, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null)
         {
-            var userExists = await _context.Users.AnyAsync(x => x.Id == userId);
-            if (!userExists)
+            if (!await _context.DoesExist<User>(userId))
             {
                 return CommonErrors.UserNotExist;
             }
