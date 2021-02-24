@@ -100,4 +100,35 @@ namespace BillTracker.Tests.Queries
             result.Result.Items.Should().NotContain(x => x.Id == expense4.Result);
         }
     }
+
+    public class ExpenseTypesQueryTests : IClassFixture<BillTrackerFixture>
+    {
+        private readonly BillTrackerWebApplicationFactory _factory;
+        private readonly BillTrackerFixture _fixture;
+
+        public ExpenseTypesQueryTests(BillTrackerFixture fixture)
+        {
+            _fixture = fixture;
+            _factory = fixture.GetWebApplicationFactory();
+        }
+
+        [Fact]
+        public async Task WhenGetAllVisibleForUser_ThenReturnsBuiltInAndCustom()
+        {
+            var user = await _fixture.CreateUser();
+            var createExpenseType = _factory.Services.GetRequiredService<CreateExpenseType>();
+            var customType1 = await createExpenseType.Handle(new CreateExpenseTypeParameters(user.Id, "Type 1"));
+            var customType2 = await createExpenseType.Handle(new CreateExpenseTypeParameters(user.Id, "Type 2"));
+            var sut = _factory.Services.GetRequiredService<ExpenseTypesQuery>();
+
+            var result = await sut.GetAllVisibleForUser(user.Id);
+
+            result.Should().HaveCount(2 + BuiltInExpenseTypes.Amount);
+            result.Should().Contain(x => x.Id == BuiltInExpenseTypes.Entertainment.Id);
+            result.Should().Contain(x => x.Id == BuiltInExpenseTypes.Food.Id);
+            result.Should().Contain(x => x.Id == BuiltInExpenseTypes.Gas.Id);
+            result.Should().Contain(x => x.Id == customType1.Result.Id);
+            result.Should().Contain(x => x.Id == customType2.Result.Id);
+        }
+    }
 }

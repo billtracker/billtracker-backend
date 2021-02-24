@@ -23,8 +23,7 @@ namespace BillTracker.Tests.Commands
         [Fact]
         public async Task UserWhoNotExistCannotAddExpense()
         {
-            using var scope = _factory.Services.CreateScope();
-            var sut = scope.ServiceProvider.GetRequiredService<AddExpense>();
+            var sut = _factory.Services.GetRequiredService<AddExpense>();
 
             var result = await sut.Handle(new AddExpenseParameters(Guid.NewGuid(), "name", 20, BuiltInExpenseTypes.Food.Id));
 
@@ -36,12 +35,26 @@ namespace BillTracker.Tests.Commands
         public async Task UserCanAddExpense()
         {
             var user = await _fixture.CreateUser();
-            using var scope = _factory.Services.CreateScope();
-            var sut = scope.ServiceProvider.GetRequiredService<AddExpense>();
+            var sut = _factory.Services.GetRequiredService<AddExpense>();
 
             var result = await sut.Handle(new AddExpenseParameters(user.Id, "name", 20, BuiltInExpenseTypes.Food.Id));
 
             result.IsError.Should().BeFalse();
+            result.Result.Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public async Task UserCanAddExpenseWithCustomType()
+        {
+            var user = await _fixture.CreateUser();
+            var createExpenseType = _factory.Services.GetRequiredService<CreateExpenseType>();
+            var customExpenseType = await createExpenseType.Handle(new CreateExpenseTypeParameters(user.Id, "Custom"));
+            var sut = _factory.Services.GetRequiredService<AddExpense>();
+
+            var result = await sut.Handle(new AddExpenseParameters(user.Id, "name", 20, customExpenseType.Result.Id));
+
+            result.IsError.Should().BeFalse();
+            result.Result.Should().NotBeEmpty();
         }
     }
 }
