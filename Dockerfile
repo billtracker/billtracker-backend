@@ -11,10 +11,9 @@ COPY . .
 RUN dotnet publish "BillTracker.Api/BillTracker.Api.csproj" -c Release -o out
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine
 WORKDIR /app
 COPY --from=build /app/out .
 
-ENV ASPNETCORE_URLS=http://0.0.0.0:5000
-
+EXPOSE 5000
 ENTRYPOINT ["dotnet", "BillTracker.Api.dll"]
