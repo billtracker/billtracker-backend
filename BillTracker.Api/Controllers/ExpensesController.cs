@@ -65,15 +65,15 @@ namespace BillTracker.Api.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<ExpenseModel>>> Post(AddExpenseRequest request)
+        public async Task<ActionResult<Guid>> Post(AddExpenseRequest request)
         {
             var result = await _addExpenseHandler.Handle(
                 new AddExpenseParameters(this.GetUserId(), request.Name, request.Amount, request.ExpenseTypeId.Value, request.AddedDate));
 
             return result.Match<ActionResult>(
-                success => CreatedAtAction(nameof(Get), new { id = result.Result }, result.Result),
+                success => Ok(result.Result),
                 error => BadRequest(error));
         }
     }

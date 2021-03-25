@@ -23,7 +23,7 @@ namespace BillTracker.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("user/register")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<LoginRequest>> Register(RegisterRequest request)
         {
@@ -34,7 +34,7 @@ namespace BillTracker.Api.Controllers
                 lastName: request.LastName);
 
             return result.Match<ActionResult>(
-                success => CreatedAtAction(nameof(Login), new LoginRequest
+                success => Ok(new LoginRequest
                 {
                     EmailAddress = request.EmailAddress,
                     Password = request.Password,
