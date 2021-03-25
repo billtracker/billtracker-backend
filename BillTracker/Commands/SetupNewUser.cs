@@ -29,16 +29,16 @@ namespace BillTracker.Commands
                 return SuccessOrError.FromSuccess();
             }
 
-            InitializeDefaultExpenseTypes(userId);
+            await InitializeDefaultExpenseTypes(user.Id);
             user.Setup();
             await _context.SaveChangesAsync();
 
             return SuccessOrError.FromSuccess();
         }
 
-        private void InitializeDefaultExpenseTypes(Guid userId)
+        private async Task InitializeDefaultExpenseTypes(Guid userId)
         {
-            var defaultExpenseTypes = _context.ExpenseTypes.Where(x => x.IsBuiltIn).ToList();
+            var defaultExpenseTypes = await _context.ExpenseTypes.Where(x => x.IsDefault).ToListAsync();
             if (defaultExpenseTypes != null && defaultExpenseTypes.Any())
             {
                 _context.ExpenseTypes.AddRange(

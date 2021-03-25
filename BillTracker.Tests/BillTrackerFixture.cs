@@ -12,15 +12,26 @@ namespace BillTracker.Tests
 
         internal BillTrackerWebApplicationFactory GetWebApplicationFactory() => Factory;
 
-        internal async Task<User> CreateUser()
+        internal User CreateUser()
         {
             var context = Factory.Services.GetRequiredService<BillTrackerContext>();
             var user = User.Create($"{Guid.NewGuid()}-xyz@syz.com", "pass", "Test", "Test");
 
-            await context.Users.AddAsync(user);
-            await context.SaveChangesAsync();
+            context.Users.Add(user);
+            context.SaveChanges();
 
             return user;
+        }
+
+        internal ExpenseType CreateExpenseType(Guid userId, string nameSuffix = "")
+        {
+            var context = Factory.Services.GetRequiredService<BillTrackerContext>();
+            var expenseType = ExpenseType.Create(userId, $"test-expense-type{nameSuffix}");
+
+            context.ExpenseTypes.Add(expenseType);
+            context.SaveChanges();
+
+            return expenseType;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace BillTracker.Commands
 
             var expenseTypeExist = await _context.ExpenseTypes.AnyAsync(
                 x => x.Name.ToLower() == parameters.Name.ToLower() &&
-                     (x.UserId == parameters.UserId || x.IsBuiltIn));
+                     (x.UserId == parameters.UserId || x.IsDefault));
             if (expenseTypeExist)
             {
                 return ExpenseTypeAlreadyExist;

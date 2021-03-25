@@ -14,10 +14,16 @@ namespace BillTracker.Tests.Commands
         private readonly BillTrackerWebApplicationFactory _factory;
         private readonly BillTrackerFixture _fixture;
 
+        private readonly User TestUser;
+        private readonly ExpenseType TestExpenseType;
+
         public AddExpenseTests(BillTrackerFixture fixture)
         {
             _fixture = fixture;
             _factory = fixture.GetWebApplicationFactory();
+
+            TestUser = _fixture.CreateUser();
+            TestExpenseType = _fixture.CreateExpenseType(TestUser.Id);
         }
 
         [Fact]
@@ -25,33 +31,18 @@ namespace BillTracker.Tests.Commands
         {
             var sut = _factory.Services.GetRequiredService<AddExpense>();
 
-            var result = await sut.Handle(new AddExpenseParameters(Guid.NewGuid(), "name", 20, BuiltInExpenseTypes.Food.Id));
+            var result = await sut.Handle(new AddExpenseParameters(Guid.NewGuid(), "name", 20, Guid.NewGuid()));
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(CommonErrors.UserNotExist);
         }
 
         [Fact]
-        public async Task UserCanAddExpense()
-        {
-            var user = await _fixture.CreateUser();
-            var sut = _factory.Services.GetRequiredService<AddExpense>();
-
-            var result = await sut.Handle(new AddExpenseParameters(user.Id, "name", 20, BuiltInExpenseTypes.Food.Id));
-
-            result.IsError.Should().BeFalse();
-            result.Result.Should().NotBeEmpty();
-        }
-
-        [Fact]
         public async Task UserCanAddExpenseWithCustomType()
         {
-            var user = await _fixture.CreateUser();
-            var createExpenseType = _factory.Services.GetRequiredService<CreateExpenseType>();
-            var customExpenseType = await createExpenseType.Handle(new CreateExpenseTypeParameters(user.Id, "Custom"));
             var sut = _factory.Services.GetRequiredService<AddExpense>();
 
-            var result = await sut.Handle(new AddExpenseParameters(user.Id, "name", 20, customExpenseType.Result.Id));
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id));
 
             result.IsError.Should().BeFalse();
             result.Result.Should().NotBeEmpty();

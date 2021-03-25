@@ -12,7 +12,7 @@ namespace BillTracker.Entities
         public string Name { get; private set; }
 
         [Required]
-        public bool IsBuiltIn { get; private set; }
+        public bool IsDefault { get; private set; }
 
         public Guid? UserId { get; private set; }
 
@@ -27,7 +27,7 @@ namespace BillTracker.Entities
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 Name = name,
-                IsBuiltIn = false,
+                IsDefault = false,
             };
     }
 }

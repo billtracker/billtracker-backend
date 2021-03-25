@@ -27,5 +27,15 @@ namespace BillTracker.Queries
 
             return result;
         }
+
+        public async Task<IEnumerable<ExpenseTypeModel>> GetAllDefault()
+        {
+            var result = await _context.ExpenseTypes
+                .Where(x => x.IsDefault)
+                .Select(x => new ExpenseTypeModel(x))
+                .ToListAsync();
+
+            return result;
+        }
     }
 }

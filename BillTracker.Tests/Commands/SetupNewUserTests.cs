@@ -16,19 +16,22 @@ namespace BillTracker.Tests.Commands
         private readonly BillTrackerWebApplicationFactory _factory;
         private readonly BillTrackerFixture _fixture;
 
+        private readonly User TestUser;
+
         public SetupNewUserTests(BillTrackerFixture fixture)
         {
             _fixture = fixture;
             _factory = fixture.GetWebApplicationFactory();
+
+            TestUser = _fixture.CreateUser();
         }
 
         [Fact]
         public async Task CanSetupUser()
         {
-            var user = await _fixture.CreateUser();
             var sut = _factory.Services.GetRequiredService<SetupNewUser>();
 
-            var result = await sut.Handle(user.Id);
+            var result = await sut.Handle(TestUser.Id);
 
             result.IsError.Should().BeFalse();
         }
@@ -36,17 +39,18 @@ namespace BillTracker.Tests.Commands
         [Fact]
         public async Task SetupUpUserIsIdempotent()
         {
-            var user = await _fixture.CreateUser();
             var sut = _factory.Services.GetRequiredService<SetupNewUser>();
 
-            var result = await sut.Handle(user.Id);
-            var result2 = await sut.Handle(user.Id);
+            var result = await sut.Handle(TestUser.Id);
+            var result2 = await sut.Handle(TestUser.Id);
+
             var expenseTypesQuery = _factory.Services.GetRequiredService<ExpenseTypesQuery>();
-            var addedExpenses = await expenseTypesQuery.GetAllVisibleForUser(user.Id);
+            var defaultExpenseTypes = await expenseTypesQuery.GetAllDefault();
+            var addedExpenses = await expenseTypesQuery.GetAllVisibleForUser(TestUser.Id);
 
             result.IsError.Should().BeFalse();
             result2.IsError.Should().BeFalse();
-            addedExpenses.Count().Should().Be(BuiltInExpenseTypes.Amount);
+            addedExpenses.Count().Should().Be(defaultExpenseTypes.Count());
         }
 
         [Fact]

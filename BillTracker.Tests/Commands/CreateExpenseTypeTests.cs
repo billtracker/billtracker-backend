@@ -12,19 +12,22 @@ namespace BillTracker.Tests.Commands
         private readonly BillTrackerWebApplicationFactory _factory;
         private readonly BillTrackerFixture _fixture;
 
+        private readonly User TestUser;
+
         public CreateExpenseTypeTests(BillTrackerFixture fixture)
         {
             _fixture = fixture;
             _factory = fixture.GetWebApplicationFactory();
+
+            TestUser = _fixture.CreateUser();
         }
 
         [Fact]
         public async Task UserCanAddExpenseTypeIfNameDoesNotExist()
         {
-            var user = await _fixture.CreateUser();
             var sut = _factory.Services.GetRequiredService<CreateExpenseType>();
 
-            var result = await sut.Handle(new CreateExpenseTypeParameters(user.Id, "Custom name"));
+            var result = await sut.Handle(new CreateExpenseTypeParameters(TestUser.Id, "Custom name"));
 
             result.IsError.Should().BeFalse();
             result.Result.Name.Should().Be("Custom name");
@@ -34,17 +37,13 @@ namespace BillTracker.Tests.Commands
         [Fact]
         public async Task UserCannotAddExpenseTypeIfNameExist()
         {
-            var user = await _fixture.CreateUser();
             var sut = _factory.Services.GetRequiredService<CreateExpenseType>();
-            await sut.Handle(new CreateExpenseTypeParameters(user.Id, "Custom name"));
+            await sut.Handle(new CreateExpenseTypeParameters(TestUser.Id, "Custom name"));
 
-            var result1 = await sut.Handle(new CreateExpenseTypeParameters(user.Id, "Custom name"));
-            var result2 = await sut.Handle(new CreateExpenseTypeParameters(user.Id, BuiltInExpenseTypes.Food.Name));
+            var result = await sut.Handle(new CreateExpenseTypeParameters(TestUser.Id, "Custom name"));
 
-            result1.IsError.Should().BeTrue();
-            result1.Error.Should().Be(CreateExpenseType.ExpenseTypeAlreadyExist);
-            result2.IsError.Should().BeTrue();
-            result2.Error.Should().Be(CreateExpenseType.ExpenseTypeAlreadyExist);
+            result.IsError.Should().BeTrue();
+            result.Error.Should().Be(CreateExpenseType.ExpenseTypeAlreadyExist);
         }
     }
 }

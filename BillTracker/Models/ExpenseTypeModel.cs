@@ -10,7 +10,7 @@ namespace BillTracker.Models
             Id = expenseType.Id;
             UserId = expenseType.UserId;
             Name = expenseType.Name;
-            IsBuiltIn = expenseType.IsBuiltIn;
+            IsBuiltIn = expenseType.IsDefault;
         }
 
         public Guid Id { get; }
