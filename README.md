@@ -39,7 +39,7 @@ Setting up the whole infrastracture with application or restarting the app after
 docker-compose -f docker-compose.test.yml up -d --build
 ```
 
-Endpoint of backend app: http://localhost:5000
+Endpoint of the backend app (also Swagger when using browser): http://localhost:5000.
 
 ### pgAdmin4
 "pgAdmin is the most popular and feature rich Open Source administration and development platform for PostgreSQL, the most advanced Open Source database in the world."
