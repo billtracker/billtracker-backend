@@ -27,6 +27,9 @@ namespace BillTracker.Entities
 
         public IEnumerable<Expense> Expenses { get; private set; }
 
+        [Required]
+        public bool WasSetup { get; private set; }
+
         public static User Create(string emailAddress, string password, string firstName, string lastName)
             => new User
             {
@@ -37,5 +40,10 @@ namespace BillTracker.Entities
                 LastName = lastName,
                 CreatedAt = DateTimeOffset.Now,
             };
+
+        public void Setup()
+        {
+            WasSetup = true;
+        }
     }
 }

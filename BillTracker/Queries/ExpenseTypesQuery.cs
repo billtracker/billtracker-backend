@@ -21,7 +21,7 @@ namespace BillTracker.Queries
         public async Task<IEnumerable<ExpenseTypeModel>> GetAllVisibleForUser(Guid userId)
         {
             var result = await _context.ExpenseTypes
-                .Where(x => x.IsBuiltIn || x.UserId == userId)
+                .Where(x => x.UserId == userId)
                 .Select(x => new ExpenseTypeModel(x))
                 .ToListAsync();
 

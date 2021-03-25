@@ -113,7 +113,7 @@ namespace BillTracker.Tests.Queries
         }
 
         [Fact]
-        public async Task WhenGetAllVisibleForUser_ThenReturnsBuiltInAndCustom()
+        public async Task WhenGetAllVisibleForUser_ThenReturnsOnlyForUser()
         {
             var user = await _fixture.CreateUser();
             var createExpenseType = _factory.Services.GetRequiredService<CreateExpenseType>();
@@ -123,10 +123,7 @@ namespace BillTracker.Tests.Queries
 
             var result = await sut.GetAllVisibleForUser(user.Id);
 
-            result.Should().HaveCount(2 + BuiltInExpenseTypes.Amount);
-            result.Should().Contain(x => x.Id == BuiltInExpenseTypes.Entertainment.Id);
-            result.Should().Contain(x => x.Id == BuiltInExpenseTypes.Food.Id);
-            result.Should().Contain(x => x.Id == BuiltInExpenseTypes.Gas.Id);
+            result.Should().HaveCount(2);
             result.Should().Contain(x => x.Id == customType1.Result.Id);
             result.Should().Contain(x => x.Id == customType2.Result.Id);
         }

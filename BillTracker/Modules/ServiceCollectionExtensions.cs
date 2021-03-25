@@ -11,9 +11,9 @@ namespace BillTracker.Modules
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureBaseServices(this IServiceCollection services, IConfiguration configuration, string environment)
+        public static IServiceCollection ConfigureBaseServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.ConfigureDatabase(configuration, environment);
+            services.ConfigureDatabase(configuration);
 
             services.AddConfiguration<IdentityConfiguration>(configuration, IdentityConfiguration.SectionName);
 
@@ -22,6 +22,7 @@ namespace BillTracker.Modules
             // Commands
             services.AddTransient<AddExpense>();
             services.AddTransient<CreateExpenseType>();
+            services.AddTransient<SetupNewUser>();
 
             // Queries
             services.AddTransient<ExpensesQuery>();
@@ -50,7 +51,7 @@ namespace BillTracker.Modules
             return services;
         }
 
-        private static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration, string environment)
+        private static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             services
                 .AddDbContext<BillTrackerContext>(
@@ -63,7 +64,7 @@ namespace BillTracker.Modules
                     ServiceLifetime.Transient,
                     ServiceLifetime.Transient);
 
-            if (environment != "IntegrationTests" && configuration.GetValue<bool>("MigrateDbOnStartup"))
+            if (configuration.GetValue<bool>("MigrateDbOnStartup"))
             {
                 services.BuildServiceProvider().GetService<BillTrackerContext>().Database.Migrate();
             }
