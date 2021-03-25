@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using BillTracker.Commands;
 using BillTracker.Entities;
 using BillTracker.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -27,11 +28,16 @@ namespace BillTracker.Identity
     {
         private readonly BillTrackerContext _context;
         private readonly IdentityConfiguration _configuration;
+        private readonly SetupNewUser _setupNewUser;
 
-        public IdentityService(BillTrackerContext context, IdentityConfiguration configuration)
+        public IdentityService(
+            BillTrackerContext context,
+            IdentityConfiguration configuration,
+            SetupNewUser setupNewUser)
         {
             _context = context;
             _configuration = configuration;
+            _setupNewUser = setupNewUser;
         }
 
         public async Task<ResultOrError<AuthenticationResult>> Login(string emailAddress, string password)
@@ -56,6 +62,8 @@ namespace BillTracker.Identity
             await _context.RefreshTokens.AddAsync(refreshToken);
 
             await _context.SaveChangesAsync();
+
+            await _setupNewUser.Handle(user.Id);
 
             return new AuthenticationResult(jwt.AccessToken, refreshToken.Token, jwt.ExpiresAt);
         }
@@ -126,7 +134,9 @@ namespace BillTracker.Identity
         private (string AccessToken, DateTimeOffset ExpiresAt) GenerateJwtToken(User user)
         {
             var key = Encoding.ASCII.GetBytes(_configuration.Secret);
-            var expiresIn = DateTime.UtcNow.AddMinutes(10);
+            var expiresIn = _configuration.AccessTokenValidity.HasValue
+                ? DateTime.UtcNow.Add(_configuration.AccessTokenValidity.Value)
+                : DateTime.UtcNow.AddMinutes(10);
 
             var accessToken = new JwtSecurityTokenHandler()
                 .CreateEncodedJwt(new SecurityTokenDescriptor
