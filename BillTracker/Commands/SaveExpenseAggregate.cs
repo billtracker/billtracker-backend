@@ -29,7 +29,7 @@ namespace BillTracker.Commands
 
         private async Task<ExpenseAggregateModel> Create(SaveExpenseAggregateParameters parameters)
         {
-            var aggregate = ExpensesAggregate.Create(parameters.UserId, parameters.Name, parameters.AddedDate);
+            var aggregate = ExpensesAggregate.Create(parameters.UserId, parameters.Name, parameters.AddedDate, parameters.IsDraft);
             await _context.ExpensesAggregates.AddAsync(aggregate);
             await _context.SaveChangesAsync();
             return new ExpenseAggregateModel(aggregate);
@@ -43,7 +43,10 @@ namespace BillTracker.Commands
                 return CommonErrors.ExpenseAggregateDoesNotExist;
             }
 
-            aggregate.Update(name: parameters.Name);
+            aggregate.Update(
+                name: parameters.Name,
+                addedDate: parameters.AddedDate,
+                isDraft: parameters.IsDraft);
             await _context.SaveChangesAsync();
 
             return new ExpenseAggregateModel(aggregate);
@@ -52,12 +55,13 @@ namespace BillTracker.Commands
 
     public class SaveExpenseAggregateParameters
     {
-        public SaveExpenseAggregateParameters(Guid? id, Guid userId, string name, DateTimeOffset? addedDate = null)
+        public SaveExpenseAggregateParameters(Guid? id, Guid userId, string name, DateTimeOffset? addedDate = null, bool isDraft = false)
         {
             Id = id;
             UserId = userId;
             Name = name;
             AddedDate = addedDate ?? DateTimeOffset.Now;
+            IsDraft = isDraft;
         }
 
         public Guid? Id { get; }
@@ -67,5 +71,7 @@ namespace BillTracker.Commands
         public string Name { get; }
 
         public DateTimeOffset AddedDate { get; }
+
+        public bool IsDraft { get; }
     }
 }

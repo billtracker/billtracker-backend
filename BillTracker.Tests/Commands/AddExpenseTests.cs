@@ -61,6 +61,7 @@ namespace BillTracker.Tests.Commands
             result.IsError.Should().BeFalse();
             result.Result.Should().NotBeEmpty();
             addedExpense.UserId.Should().Be(TestUser.Id);
+            addedExpense.Name.Should().Be("name");
             addedExpense.ExpenseTypeName.Should().Be(TestExpenseType.Name);
             addedExpense.Amount.Should().Be(20);
         }
@@ -73,11 +74,12 @@ namespace BillTracker.Tests.Commands
 
             var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id));
             var addedExpense = await query.GetById(result.Result);
+            var aggregate = await query.GetExpensesAggregate(addedExpense.AggregateId);
 
             result.IsError.Should().BeFalse();
             result.Result.Should().NotBeEmpty();
             addedExpense.AggregateId.Should().NotBeEmpty();
-            addedExpense.AggregateName.Should().Be(addedExpense.Name);
+            aggregate.Name.Should().Be("name");
         }
 
         [Fact]
@@ -89,6 +91,22 @@ namespace BillTracker.Tests.Commands
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(CommonErrors.ExpenseAggregateDoesNotExist);
+        }
+
+        [Fact]
+        public async Task AddingExpenseWithExistingAggregateCreatesExpenseWithThatReferencedAggregate()
+        {
+            var saveAggregate = _factory.Services.GetRequiredService<SaveExpenseAggregate>();
+            var queryExpense = _factory.Services.GetRequiredService<ExpensesQuery>();
+            var aggregate = await saveAggregate.Handle(new SaveExpenseAggregateParameters(null, TestUser.Id, "agg"));
+            var sut = _factory.Services.GetRequiredService<AddExpense>();
+
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id, aggregateId: aggregate.Result.Id));
+            var addedExpense = await queryExpense.GetById(result.Result);
+
+            result.IsError.Should().BeFalse();
+            addedExpense.Should().NotBeNull();
+            addedExpense.AggregateId.Should().Be(aggregate.Result.Id);
         }
     }
 }

@@ -78,6 +78,7 @@ namespace BillTracker.Queries
                 .Include(x => x.Aggregate)
                 .Where(
                     x => x.Aggregate.UserId == userId &&
+                         !x.Aggregate.IsDraft &&
                          (!fromDate.HasValue || x.Aggregate.AddedDate >= fromDate.Value) &&
                          (!toDate.HasValue || x.Aggregate.AddedDate <= toDate.Value));
 
@@ -91,7 +92,7 @@ namespace BillTracker.Queries
         {
             var result = await _context.DashboardCalendarDays
                 .Where(x => x.UserId == userId)
-                .Select(x => new CalendarDayModel(x.AddedAt, x.TotalAmount))
+                .Select(x => new CalendarDayModel(x.AddedDate, x.TotalAmount))
                 .ToListAsync();
 
             return result;

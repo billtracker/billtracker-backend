@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BillTracker.Commands;
 using BillTracker.Entities;
@@ -131,6 +132,26 @@ namespace BillTracker.Tests.Queries
             dashboard.Result.Metrics.Total.Should().Be(0);
             dashboard.Result.Calendar.Should().BeEmpty();
             dashboard.Result.ExpenseTypes.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task WhenGet_GivenNoFilters_ThenReturnsMetricsFromNoDraftAggregates()
+        {
+            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
+            var saveAggregate = _factory.Services.GetRequiredService<SaveExpenseAggregate>();
+            var draftAggregate = await saveAggregate.Handle(new SaveExpenseAggregateParameters(null, TestUser.Id, "aggregate", isDraft: true));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 100, TestExpenseType1.Id, aggregateId: draftAggregate.Result.Id));
+            var sut = _factory.Services.GetRequiredService<DashboardQuery>();
+
+            var dashboard = await sut.GetDashboard(TestUser.Id);
+
+            dashboard.IsError.Should().BeFalse();
+            dashboard.Result.Metrics.Tranfers.Should().Be(3);
+            dashboard.Result.Metrics.Total.Should().Be(30);
+            dashboard.Result.ExpenseTypes.First().Total.Should().Be(30);
         }
     }
 }

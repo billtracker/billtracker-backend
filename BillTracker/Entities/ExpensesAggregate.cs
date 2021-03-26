@@ -19,25 +19,32 @@ namespace BillTracker.Entities
         [Required]
         public DateTimeOffset AddedDate { get; private set; }
 
-        public ICollection<Expense> Expenses { get; private set; }
+        public ICollection<Expense> Expenses { get; private set; } = new List<Expense>();
+
+        [Required]
+        public bool IsDraft { get; private set; }
 
         public static ExpensesAggregate Create(
             Guid userId,
             string name,
-            DateTimeOffset addedDate) => new ExpensesAggregate
+            DateTimeOffset addedDate,
+            bool isDraft) => new ExpensesAggregate
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 Name = name,
                 AddedDate = addedDate,
+                IsDraft = isDraft,
             };
 
         public void Update(
             string name = null,
-            DateTimeOffset? addedDate = null)
+            DateTimeOffset? addedDate = null,
+            bool? isDraft = null)
         {
             Name = string.IsNullOrEmpty(name) ? Name : name;
             AddedDate = addedDate ?? AddedDate;
+            IsDraft = isDraft ?? IsDraft;
         }
     }
 }

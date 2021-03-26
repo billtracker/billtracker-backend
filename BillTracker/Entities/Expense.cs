@@ -18,7 +18,7 @@ namespace BillTracker.Entities
 
         public ExpenseType ExpenseType { get; private set; }
 
-        public Guid? AggregateId { get; private set; }
+        public Guid AggregateId { get; private set; }
 
         public ExpensesAggregate Aggregate { get; private set; }
 
@@ -26,7 +26,7 @@ namespace BillTracker.Entities
             string name,
             decimal amount,
             Guid expenseTypeId,
-            Guid? aggregateId = null) => new Expense
+            Guid aggregateId) => new Expense
             {
                 Id = Guid.NewGuid(),
                 Name = name,

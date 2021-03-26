@@ -31,14 +31,16 @@ namespace BillTracker.Commands
 
             Expense newExpense;
             var aggregateId = input.AggregateId;
-            if (aggregateId.HasValue &&
-                !await _context.ExpensesAggregates.AnyAsync(x => x.Id == input.AggregateId.Value))
+            if (aggregateId.HasValue)
             {
-                return CommonErrors.ExpenseAggregateDoesNotExist;
+                if (!await _context.ExpensesAggregates.AnyAsync(x => x.Id == input.AggregateId.Value))
+                {
+                    return CommonErrors.ExpenseAggregateDoesNotExist;
+                }
             }
             else
             {
-                var aggregate = ExpensesAggregate.Create(input.UserId, input.Name, input.AddedDate);
+                var aggregate = ExpensesAggregate.Create(input.UserId, input.Name, input.AddedDate, isDraft: false);
                 await _context.ExpensesAggregates.AddAsync(aggregate);
                 aggregateId = aggregate.Id;
             }

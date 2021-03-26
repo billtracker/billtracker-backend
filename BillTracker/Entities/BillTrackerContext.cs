@@ -55,9 +55,10 @@ namespace BillTracker.Entities
 SELECT
     ea.""{nameof(ExpensesAggregate.UserId)}"" AS ""{nameof(DashboardCalendarDayView.UserId)}"",
     SUM(e.""{nameof(Expense.Amount)}"") AS ""{nameof(DashboardCalendarDayView.TotalAmount)}"",
-    ea.""{nameof(ExpensesAggregate.AddedDate)}""::DATE AS ""{nameof(DashboardCalendarDayView.AddedAt)}""
+    ea.""{nameof(ExpensesAggregate.AddedDate)}""::DATE AS ""{nameof(DashboardCalendarDayView.AddedDate)}""
 FROM ""{nameof(Expenses)}"" AS e
 JOIN ""{nameof(ExpensesAggregates)}"" AS ea ON e.""{nameof(Expense.AggregateId)}"" = ea.""{nameof(ExpensesAggregate.Id)}""
+WHERE ea.""{nameof(ExpensesAggregate.IsDraft)}"" = false
 GROUP BY 
     ea.""{nameof(ExpensesAggregate.UserId)}"",
     ea.""{nameof(ExpensesAggregate.AddedDate)}""::DATE");

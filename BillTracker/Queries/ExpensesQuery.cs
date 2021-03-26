@@ -65,5 +65,15 @@ namespace BillTracker.Queries
             return ResultOrError<PagedResult<ExpenseModel>>.FromResult(
                 new PagedResult<ExpenseModel>(resultItems, totalItems));
         }
+
+        public async Task<ExpenseAggregateModel> GetExpensesAggregate(Guid aggregateId)
+        {
+            var result = await _context.ExpensesAggregates
+                .Include(x => x.Expenses)
+                .ThenInclude(x => x.ExpenseType)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(x => x.Id == aggregateId);
+            return result == null ? null : new ExpenseAggregateModel(result);
+        }
     }
 }

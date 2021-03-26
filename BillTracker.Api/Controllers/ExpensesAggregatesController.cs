@@ -27,7 +27,8 @@ namespace BillTracker.Api.Controllers
                     request.Id,
                     request.UserId,
                     request.Name,
-                    request.AddedDate));
+                    request.AddedDate,
+                    request.IsDraft));
 
             return result.Match<ActionResult>(
                 success => Ok(success),

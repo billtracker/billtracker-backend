@@ -6,7 +6,7 @@ namespace BillTracker.Entities
     {
         public Guid UserId { get; private set; }
 
-        public DateTime AddedAt { get; private set; }
+        public DateTime AddedDate { get; private set; }
 
         public decimal TotalAmount { get; private set; }
     }

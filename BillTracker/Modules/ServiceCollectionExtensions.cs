@@ -23,6 +23,7 @@ namespace BillTracker.Modules
             services.AddTransient<AddExpense>();
             services.AddTransient<CreateExpenseType>();
             services.AddTransient<SetupNewUser>();
+            services.AddTransient<SaveExpenseAggregate>();
 
             // Queries
             services.AddTransient<ExpensesQuery>();

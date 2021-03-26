@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BillTracker.Entities;
 
 namespace BillTracker.Models
@@ -10,6 +12,8 @@ namespace BillTracker.Models
             Id = entity.Id;
             Name = entity.Name;
             UserId = entity.UserId;
+            IsDraft = entity.IsDraft;
+            Expenses = entity.Expenses.Select(x => new ExpenseModel(x));
         }
 
         public Guid Id { get; }
@@ -17,5 +21,17 @@ namespace BillTracker.Models
         public string Name { get; }
 
         public Guid UserId { get; }
+
+        public bool IsDraft { get; }
+
+        public decimal TotalAmount
+        {
+            get
+            {
+                return Expenses.Sum(x => x.Amount);
+            }
+        }
+
+        public IEnumerable<ExpenseModel> Expenses { get; }
     }
 }

@@ -16,8 +16,7 @@ namespace BillTracker.Models
             ExpenseTypeId = expense.ExpenseTypeId;
             ExpenseTypeName = expense.ExpenseType.Name;
 
-            AggregateId = expense.Aggregate.Id;
-            AggregateName = expense.Aggregate.Name;
+            AggregateId = expense.AggregateId;
         }
 
         public Guid Id { get; }
@@ -35,7 +34,5 @@ namespace BillTracker.Models
         public string ExpenseTypeName { get; }
 
         public Guid AggregateId { get; }
-
-        public string AggregateName { get; }
     }
 }
