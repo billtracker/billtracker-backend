@@ -13,9 +13,7 @@ namespace BillTracker.Api.Models.Identity
         public string Password { get; set; }
 
         [Required]
-        public string FirstName { get; set; }
-
-        [Required]
-        public string LastName { get; set; }
+        [MinLength(2)]
+        public string UserName { get; set; }
     }
 }

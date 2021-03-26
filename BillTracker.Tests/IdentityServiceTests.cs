@@ -23,7 +23,7 @@ namespace BillTracker.Tests
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
 
-            var result = await sut.Register(testId + "test@xyz.com", "pass1", "name", "last");
+            var result = await sut.Register(testId + "test@xyz.com", "pass1", testId.ToString());
 
             result.IsError.Should().BeFalse();
             result.Error.Should().BeNullOrEmpty();
@@ -36,8 +36,21 @@ namespace BillTracker.Tests
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
 
-            await sut.Register(email, "pass1", "name", "last");
-            var result = await sut.Register(email, "pass1", "name", "last");
+            await sut.Register(email, "pass1", $"{testId}-1");
+            var result = await sut.Register(email, "pass1", $"{testId}-2");
+
+            result.IsError.Should().BeTrue();
+            result.Error.Should().Be(IdentityErrors.EmailTaken);
+        }
+
+        [Fact]
+        public async Task CantRegisterIfUserNameIsTaken()
+        {
+            using var scope = _factory.Services.CreateScope();
+            var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
+
+            await sut.Register($"{testId}-test1@xyz.com", "pass1", testId.ToString());
+            var result = await sut.Register($"{testId}-test2@xyz.com", "pass1", testId.ToString());
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(IdentityErrors.EmailTaken);
@@ -56,16 +69,36 @@ namespace BillTracker.Tests
         }
 
         [Fact]
-        public async Task CanLoginIfParametersAreOk()
+        public async Task CanLoginWithUserName()
         {
             var email = testId + "test@xyz.com";
+            var userName = testId + "username";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
-            await sut.Register(email, password, "name", "last");
+            await sut.Register(email, password, userName);
 
             var result = await sut.Login(email, password);
+
+            result.IsError.Should().BeFalse();
+            result.Error.Should().BeNullOrEmpty();
+            result.Result.AccessToken.Should().NotBeNull();
+            result.Result.RefreshToken.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task CanLoginWithEmailAddress()
+        {
+            var email = testId + "test@xyz.com";
+            var userName = testId + "username";
+            const string password = "pass1";
+
+            using var scope = _factory.Services.CreateScope();
+            var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
+            await sut.Register(email, password, userName);
+
+            var result = await sut.Login(userName, password);
 
             result.IsError.Should().BeFalse();
             result.Error.Should().BeNullOrEmpty();
@@ -77,11 +110,12 @@ namespace BillTracker.Tests
         public async Task CantReuseRefreshTokenWhenWasUsedToRefresh()
         {
             var email = testId + "test@xyz.com";
+            var userName = testId + "username";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
-            await sut.Register(email, password, "name", "last");
+            await sut.Register(email, password, userName);
 
             var loggedIn = await sut.Login(email, password);
             loggedIn.IsError.Should().BeFalse();
@@ -100,11 +134,12 @@ namespace BillTracker.Tests
         public async Task CanRevokeToken()
         {
             var email = testId + "test@xyz.com";
+            var userName = testId + "username";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
-            await sut.Register(email, password, "name", "last");
+            await sut.Register(email, password, userName);
             var loggedIn = await sut.Login(email, password);
             loggedIn.IsError.Should().BeFalse();
 
@@ -118,11 +153,12 @@ namespace BillTracker.Tests
         public async Task CantRevokeTokenIfNotExist()
         {
             var email = testId + "test@xyz.com";
+            var userName = testId + "username";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
-            await sut.Register(email, password, "name", "last");
+            await sut.Register(email, password, userName);
             var loggedIn = await sut.Login(email, password);
             loggedIn.IsError.Should().BeFalse();
             var refreshResult = await sut.RefreshToken(loggedIn.Result.RefreshToken);
@@ -138,11 +174,12 @@ namespace BillTracker.Tests
         public async Task CantUseRefreshTokenThatWasCreatedBeforeLogin()
         {
             var email = testId + "test@xyz.com";
+            var userName = testId + "username";
             const string password = "pass1";
 
             using var scope = _factory.Services.CreateScope();
             var sut = scope.ServiceProvider.GetRequiredService<IIdentityService>();
-            await sut.Register(email, password, "name", "last");
+            await sut.Register(email, password, userName);
 
             var loggedIn = await sut.Login(email, password);
             loggedIn.IsError.Should().BeFalse();

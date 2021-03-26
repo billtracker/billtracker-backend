@@ -23,6 +23,12 @@ namespace BillTracker.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>(user =>
+            {
+                user.HasIndex(x => x.UserName).IsUnique();
+                user.HasIndex(x => x.EmailAddress).IsUnique();
+            });
+
             modelBuilder.Entity<RefreshToken>(token =>
             {
                 token.HasOne(p => p.User)

@@ -15,7 +15,8 @@ namespace BillTracker.Tests
         internal User CreateUser()
         {
             var context = Factory.Services.GetRequiredService<BillTrackerContext>();
-            var user = User.Create($"{Guid.NewGuid()}-xyz@syz.com", "pass", "Test", "Test");
+            var id = Guid.NewGuid();
+            var user = User.Create($"email-{id}@syz.com", "pass", $"username-{id}");
 
             context.Users.Add(user);
             context.SaveChanges();

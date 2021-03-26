@@ -15,9 +15,9 @@ namespace BillTracker.Identity
 {
     public interface IIdentityService
     {
-        Task<ResultOrError<AuthenticationResult>> Login(string emailAddress, string password);
+        Task<ResultOrError<AuthenticationResult>> Login(string emailAddressOrUserName, string password);
 
-        Task<SuccessOrError> Register(string emailAddress, string password, string firstName, string lastName);
+        Task<SuccessOrError> Register(string emailAddress, string password, string userName);
 
         Task<ResultOrError<AuthenticationResult>> RefreshToken(string refreshToken);
 
@@ -40,11 +40,13 @@ namespace BillTracker.Identity
             _setupNewUser = setupNewUser;
         }
 
-        public async Task<ResultOrError<AuthenticationResult>> Login(string emailAddress, string password)
+        public async Task<ResultOrError<AuthenticationResult>> Login(string emailAddressOrUserName, string password)
         {
             var user = await _context.Users
                 .Include(x => x.RefreshToken)
-                .SingleOrDefaultAsync(x => x.EmailAddress.ToLower() == emailAddress.ToLower());
+                .SingleOrDefaultAsync(x =>
+                    x.EmailAddress.ToLower() == emailAddressOrUserName.ToLower() ||
+                    x.UserName.ToLower() == emailAddressOrUserName.ToLower());
 
             if (user == null || !new SimpleHash().Verify(password, user.Password))
             {
@@ -89,16 +91,19 @@ namespace BillTracker.Identity
             return new AuthenticationResult(newJwt.AccessToken, newRefreshToken.Token, newJwt.ExpiresAt);
         }
 
-        public async Task<SuccessOrError> Register(string emailAddress, string password, string firstName, string lastName)
+        public async Task<SuccessOrError> Register(string emailAddress, string password, string userName)
         {
-            var emailAddressTaken = await _context.Users.AnyAsync(x => x.EmailAddress.ToLower() == emailAddress.ToLower());
+            var emailAddressTaken = await _context.Users
+                .AnyAsync(x =>
+                    x.EmailAddress.ToLower() == emailAddress.ToLower() ||
+                    x.UserName.ToLower() == userName.ToLower());
             if (emailAddressTaken)
             {
                 return IdentityErrors.EmailTaken;
             }
 
             var hashedPassword = new SimpleHash().Compute(password);
-            var newUser = User.Create(emailAddress, hashedPassword, firstName, lastName);
+            var newUser = User.Create(emailAddress, hashedPassword, userName);
             await _context.Users.AddAsync(newUser);
             await _context.SaveChangesAsync();
 
@@ -145,7 +150,7 @@ namespace BillTracker.Identity
                     {
                         new Claim(IdentityClaims.UserId, user.Id.ToString()),
                         new Claim(IdentityClaims.EmailAddress, user.EmailAddress),
-                        new Claim(IdentityClaims.UserName, $"{user.FirstName} {user.LastName}"),
+                        new Claim(IdentityClaims.UserName, user.UserName),
                     }),
                     Expires = expiresIn,
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BillTracker.Entities
@@ -12,10 +11,7 @@ namespace BillTracker.Entities
         public string EmailAddress { get; private set; }
 
         [Required]
-        public string FirstName { get; private set; }
-
-        [Required]
-        public string LastName { get; private set; }
+        public string UserName { get; private set; }
 
         [Required]
         public string Password { get; private set; }
@@ -28,14 +24,13 @@ namespace BillTracker.Entities
         [Required]
         public bool WasSetup { get; private set; }
 
-        public static User Create(string emailAddress, string password, string firstName, string lastName)
+        public static User Create(string emailAddress, string password, string userName)
             => new User
             {
                 Id = Guid.NewGuid(),
                 Password = password,
                 EmailAddress = emailAddress,
-                FirstName = firstName,
-                LastName = lastName,
+                UserName = userName,
                 CreatedAt = DateTimeOffset.Now,
             };
 
