@@ -36,7 +36,7 @@ namespace BillTracker.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    AddedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    AddedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                 },
                 constraints: table =>
                 {
