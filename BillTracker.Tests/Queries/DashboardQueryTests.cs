@@ -143,7 +143,7 @@ namespace BillTracker.Tests.Queries
             await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
             await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
             await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 100, TestExpenseType1.Id, aggregateId: draftAggregate.Result.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 100, TestExpenseType1.Id, aggregateId: draftAggregate.Result));
             var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(TestUser.Id);

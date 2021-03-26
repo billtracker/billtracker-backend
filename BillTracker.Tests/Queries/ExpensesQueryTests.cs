@@ -102,5 +102,27 @@ namespace BillTracker.Tests.Queries
             result.Result.Items.Should().NotContain(x => x.Id == expense3.Result);
             result.Result.Items.Should().NotContain(x => x.Id == expense4.Result);
         }
+
+        [Fact]
+        public async Task WhenGetManyExpensesAggregate_GivenFilters_ThenReturnsPartOfData()
+        {
+            var initDate = DateTimeOffset.Now;
+            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
+            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType.Id, addedDate: initDate));
+            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id, addedDate: initDate.AddDays(1)));
+            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, TestExpenseType.Id, addedDate: initDate.AddDays(2)));
+            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, TestExpenseType.Id, addedDate: initDate.AddDays(3)));
+            var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
+
+            var result = await sut.GetManyExpensesAggregate(TestUser.Id, 1, fromDate: initDate, toDate: initDate.AddDays(2));
+
+            result.IsError.Should().BeFalse();
+            result.Result.TotalItems.Should().Be(3);
+            result.Result.Items.Count().Should().Be(3);
+            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense1.Result) && agg.TotalAmount == 10);
+            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense2.Result) && agg.TotalAmount == 20);
+            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense3.Result) && agg.TotalAmount == 30);
+            result.Result.Items.All(agg => !agg.Expenses.Any(x => x.Id == expense4.Result)).Should().BeTrue();
+        }
     }
 }

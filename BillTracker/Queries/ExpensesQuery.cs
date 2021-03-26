@@ -35,6 +35,51 @@ namespace BillTracker.Queries
                 return CommonErrors.UserNotExist;
             }
 
+            var baseQuery = _context.Expenses
+                .Include(x => x.Aggregate)
+                .Include(x => x.ExpenseType)
+                .Where(x => x.Aggregate.UserId == userId);
+
+            if (fromDate.HasValue)
+            {
+                baseQuery = baseQuery.Where(x => x.Aggregate.AddedDate >= fromDate.Value);
+            }
+
+            if (toDate.HasValue)
+            {
+                baseQuery = baseQuery.Where(x => x.Aggregate.AddedDate <= toDate.Value);
+            }
+
+            var totalItems = await baseQuery.CountAsync();
+            var items = totalItems == 0
+                ? new List<ExpenseModel>()
+                : await baseQuery.OrderByDescending(x => x.Aggregate.AddedDate)
+                                 .Skip((pageNumber - 1) * pageSize)
+                                 .Take(pageSize)
+                                 .Select(x => new ExpenseModel(x))
+                                 .ToListAsync();
+
+            return ResultOrError<PagedResult<ExpenseModel>>.FromResult(
+                new PagedResult<ExpenseModel>(items, totalItems));
+        }
+
+        public async Task<ExpenseAggregateModel> GetExpensesAggregate(Guid aggregateId)
+        {
+            var result = await _context.ExpensesAggregates
+                .Include(x => x.Expenses)
+                .ThenInclude(x => x.ExpenseType)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(x => x.Id == aggregateId);
+            return result == null ? null : new ExpenseAggregateModel(result);
+        }
+
+        public async Task<ResultOrError<PagedResult<ExpenseAggregateModel>>> GetManyExpensesAggregate(Guid userId, int pageNumber, int pageSize = 50, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null)
+        {
+            if (!await _context.DoesExist<User>(userId))
+            {
+                return CommonErrors.UserNotExist;
+            }
+
             var baseQuery = _context.ExpensesAggregates
                 .Include(x => x.Expenses)
                 .ThenInclude(x => x.ExpenseType)
@@ -52,28 +97,15 @@ namespace BillTracker.Queries
 
             var totalItems = await baseQuery.CountAsync();
             var items = totalItems == 0
-                ? new List<ExpensesAggregate>()
+                ? new List<ExpenseAggregateModel>()
                 : await baseQuery.OrderByDescending(x => x.AddedDate)
                                  .Skip((pageNumber - 1) * pageSize)
                                  .Take(pageSize)
-                                 .AsNoTracking()
+                                 .Select(x => new ExpenseAggregateModel(x))
                                  .ToListAsync();
 
-            var resultItems = items
-                .SelectMany(x => x.Expenses)
-                .Select(x => new ExpenseModel(x));
-            return ResultOrError<PagedResult<ExpenseModel>>.FromResult(
-                new PagedResult<ExpenseModel>(resultItems, totalItems));
-        }
-
-        public async Task<ExpenseAggregateModel> GetExpensesAggregate(Guid aggregateId)
-        {
-            var result = await _context.ExpensesAggregates
-                .Include(x => x.Expenses)
-                .ThenInclude(x => x.ExpenseType)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(x => x.Id == aggregateId);
-            return result == null ? null : new ExpenseAggregateModel(result);
+            return ResultOrError<PagedResult<ExpenseAggregateModel>>.FromResult(
+                new PagedResult<ExpenseAggregateModel>(items, totalItems));
         }
     }
 }

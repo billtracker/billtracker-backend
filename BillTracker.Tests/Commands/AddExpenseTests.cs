@@ -101,12 +101,12 @@ namespace BillTracker.Tests.Commands
             var aggregate = await saveAggregate.Handle(new SaveExpenseAggregateParameters(null, TestUser.Id, "agg"));
             var sut = _factory.Services.GetRequiredService<AddExpense>();
 
-            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id, aggregateId: aggregate.Result.Id));
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id, aggregateId: aggregate.Result));
             var addedExpense = await queryExpense.GetById(result.Result);
 
             result.IsError.Should().BeFalse();
             addedExpense.Should().NotBeNull();
-            addedExpense.AggregateId.Should().Be(aggregate.Result.Id);
+            addedExpense.AggregateId.Should().Be(aggregate.Result);
         }
     }
 }

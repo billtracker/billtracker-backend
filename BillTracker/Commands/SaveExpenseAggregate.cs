@@ -16,7 +16,7 @@ namespace BillTracker.Commands
             _context = context;
         }
 
-        public async Task<ResultOrError<ExpenseAggregateModel>> Handle(SaveExpenseAggregateParameters parameters)
+        public async Task<ResultOrError<Guid>> Handle(SaveExpenseAggregateParameters parameters)
         {
             if (parameters.Id.HasValue)
             {
@@ -27,15 +27,15 @@ namespace BillTracker.Commands
             return result;
         }
 
-        private async Task<ExpenseAggregateModel> Create(SaveExpenseAggregateParameters parameters)
+        private async Task<Guid> Create(SaveExpenseAggregateParameters parameters)
         {
             var aggregate = ExpensesAggregate.Create(parameters.UserId, parameters.Name, parameters.AddedDate, parameters.IsDraft);
             await _context.ExpensesAggregates.AddAsync(aggregate);
             await _context.SaveChangesAsync();
-            return new ExpenseAggregateModel(aggregate);
+            return aggregate.Id;
         }
 
-        private async Task<ResultOrError<ExpenseAggregateModel>> Update(SaveExpenseAggregateParameters parameters)
+        private async Task<ResultOrError<Guid>> Update(SaveExpenseAggregateParameters parameters)
         {
             var aggregate = await _context.ExpensesAggregates.SingleOrDefaultAsync(x => x.Id == parameters.Id.Value);
             if (aggregate == null)
@@ -49,7 +49,7 @@ namespace BillTracker.Commands
                 isDraft: parameters.IsDraft);
             await _context.SaveChangesAsync();
 
-            return new ExpenseAggregateModel(aggregate);
+            return aggregate.Id;
         }
     }
 

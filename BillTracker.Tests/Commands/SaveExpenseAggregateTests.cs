@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using BillTracker.Commands;
 using BillTracker.Entities;
+using BillTracker.Queries;
 using BillTracker.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,15 +31,17 @@ namespace BillTracker.Tests.Commands
         public async Task WhenAggregateIdIsNullThenCreatesNew()
         {
             var sut = _factory.Services.GetRequiredService<SaveExpenseAggregate>();
+            var expensesQuery = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.Handle(new SaveExpenseAggregateParameters(null, TestUser.Id, "name"));
+            var newAggregate = await expensesQuery.GetExpensesAggregate(result.Result);
 
             result.IsError.Should().BeFalse();
-            result.Result.IsDraft.Should().BeFalse();
-            result.Result.Expenses.Should().BeEmpty();
-            result.Result.Name.Should().Be("name");
-            result.Result.TotalAmount.Should().Be(0);
-            result.Result.UserId.Should().Be(TestUser.Id);
+            newAggregate.IsDraft.Should().BeFalse();
+            newAggregate.Expenses.Should().BeEmpty();
+            newAggregate.Name.Should().Be("name");
+            newAggregate.TotalAmount.Should().Be(0);
+            newAggregate.UserId.Should().Be(TestUser.Id);
         }
 
         [Fact]

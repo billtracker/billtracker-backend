@@ -8,8 +8,6 @@ namespace BillTracker.Api.Models
 
         public DateTimeOffset? AddedDate { get; set; }
 
-        public Guid UserId { get; set; }
-
         public string Name { get; set; }
 
         public bool IsDraft { get; set; }
