@@ -5,6 +5,8 @@ namespace BillTracker.Api.Models
 {
     public class AddExpenseRequest
     {
+        public Guid? AggregateId { get; set; }
+
         [Required]
         public string Name { get; set; }
 

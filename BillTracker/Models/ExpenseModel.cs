@@ -8,20 +8,23 @@ namespace BillTracker.Models
         internal ExpenseModel(Expense expense)
         {
             Id = expense.Id;
-            AddedById = expense.UserId;
-            AddedAt = expense.AddedDate;
+            UserId = expense.Aggregate.UserId;
+            AddedDate = expense.Aggregate.AddedDate;
             Name = expense.Name;
             Amount = expense.Amount;
 
             ExpenseTypeId = expense.ExpenseTypeId;
             ExpenseTypeName = expense.ExpenseType.Name;
+
+            AggregateId = expense.Aggregate.Id;
+            AggregateName = expense.Aggregate.Name;
         }
 
         public Guid Id { get; }
 
-        public Guid AddedById { get; }
+        public Guid UserId { get; }
 
-        public DateTimeOffset AddedAt { get; }
+        public DateTimeOffset AddedDate { get; }
 
         public string Name { get; }
 
@@ -30,5 +33,9 @@ namespace BillTracker.Models
         public Guid ExpenseTypeId { get; }
 
         public string ExpenseTypeName { get; }
+
+        public Guid AggregateId { get; }
+
+        public string AggregateName { get; }
     }
 }

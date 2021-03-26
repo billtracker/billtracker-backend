@@ -42,7 +42,7 @@ namespace BillTracker.Queries
 
             var peakStats = await baseQuery
                 .GroupBy(
-                    x => x.UserId,
+                    x => x.Aggregate.UserId,
                     (key, expenses) => new
                     {
                         Total = expenses.Sum(x => x.Amount),
@@ -75,10 +75,11 @@ namespace BillTracker.Queries
         {
             var baseQuery = _context.Expenses
                 .Include(x => x.ExpenseType)
+                .Include(x => x.Aggregate)
                 .Where(
-                    x => x.UserId == userId &&
-                         (!fromDate.HasValue || x.AddedDate >= fromDate.Value) &&
-                         (!toDate.HasValue || x.AddedDate <= toDate.Value));
+                    x => x.Aggregate.UserId == userId &&
+                         (!fromDate.HasValue || x.Aggregate.AddedDate >= fromDate.Value) &&
+                         (!toDate.HasValue || x.Aggregate.AddedDate <= toDate.Value));
 
             var metrics = await GetMetrics(baseQuery);
             var expenseTypes = await GetExpenseTypes(baseQuery);
@@ -89,7 +90,7 @@ namespace BillTracker.Queries
         private async Task<IReadOnlyList<CalendarDayModel>> GetCalendar(Guid userId)
         {
             var result = await _context.DashboardCalendarDays
-                .Where(x => x.AddedById == userId)
+                .Where(x => x.UserId == userId)
                 .Select(x => new CalendarDayModel(x.AddedAt, x.TotalAmount))
                 .ToListAsync();
 

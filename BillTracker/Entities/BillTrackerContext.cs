@@ -13,6 +13,8 @@ namespace BillTracker.Entities
 
         internal virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
+        internal virtual DbSet<ExpensesAggregate> ExpensesAggregates { get; set; }
+
         internal virtual DbSet<Expense> Expenses { get; set; }
 
         internal virtual DbSet<ExpenseType> ExpenseTypes { get; set; }
@@ -32,9 +34,9 @@ namespace BillTracker.Entities
 
             modelBuilder.Entity<Expense>(expense =>
             {
-                expense.HasOne(x => x.User)
+                expense.HasOne(x => x.Aggregate)
                        .WithMany(x => x.Expenses)
-                       .HasForeignKey(x => x.UserId);
+                       .HasForeignKey(x => x.AggregateId);
             });
 
             modelBuilder.Entity<ExpenseType>(type =>
@@ -51,13 +53,14 @@ namespace BillTracker.Entities
                            .ToView(null)
                            .ToSqlQuery($@"
 SELECT
-    ""{nameof(Expense.UserId)}"" AS ""{nameof(DashboardCalendarDayView.AddedById)}"",
-    SUM(""{nameof(Expense.Amount)}"") AS ""{nameof(DashboardCalendarDayView.TotalAmount)}"",
-    ""{nameof(Expense.AddedDate)}""::DATE AS ""{nameof(DashboardCalendarDayView.AddedAt)}""
-FROM ""{nameof(Expenses)}""
+    ea.""{nameof(ExpensesAggregate.UserId)}"" AS ""{nameof(DashboardCalendarDayView.UserId)}"",
+    SUM(e.""{nameof(Expense.Amount)}"") AS ""{nameof(DashboardCalendarDayView.TotalAmount)}"",
+    ea.""{nameof(ExpensesAggregate.AddedDate)}""::DATE AS ""{nameof(DashboardCalendarDayView.AddedAt)}""
+FROM ""{nameof(Expenses)}"" AS e
+JOIN ""{nameof(ExpensesAggregates)}"" AS ea ON e.""{nameof(Expense.AggregateId)}"" = ea.""{nameof(ExpensesAggregate.Id)}""
 GROUP BY 
-    ""{nameof(Expense.UserId)}"",
-    ""{nameof(Expense.AddedDate)}""::DATE");
+    ea.""{nameof(ExpensesAggregate.UserId)}"",
+    ea.""{nameof(ExpensesAggregate.AddedDate)}""::DATE");
             });
         }
     }

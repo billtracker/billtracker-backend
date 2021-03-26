@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BillTracker.Entities;
-using BillTracker.Models;
 using BillTracker.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace BillTracker.Commands
 {
@@ -29,23 +29,39 @@ namespace BillTracker.Commands
                 return ExpenseTypeNotExist;
             }
 
-            var expense = Expense.Create(input.UserId, input.Name, input.Amount, input.AddedDate, input.ExpenseTypeId);
-            await _context.Expenses.AddAsync(expense);
+            Expense newExpense;
+            var aggregateId = input.AggregateId;
+            if (aggregateId.HasValue &&
+                !await _context.ExpensesAggregates.AnyAsync(x => x.Id == input.AggregateId.Value))
+            {
+                return CommonErrors.ExpenseAggregateDoesNotExist;
+            }
+            else
+            {
+                var aggregate = ExpensesAggregate.Create(input.UserId, input.Name, input.AddedDate);
+                await _context.ExpensesAggregates.AddAsync(aggregate);
+                aggregateId = aggregate.Id;
+            }
+
+            newExpense = Expense.Create(input.Name, input.Amount, input.ExpenseTypeId, aggregateId.Value);
+            await _context.Expenses.AddAsync(newExpense);
             await _context.SaveChangesAsync();
 
-            return expense.Id;
+            return newExpense.Id;
         }
     }
 
     public class AddExpenseParameters
     {
-        public AddExpenseParameters(Guid userId, string name, decimal amount, Guid expenseTypeId, DateTimeOffset? addedDate = null)
+        public AddExpenseParameters(
+            Guid userId, string name, decimal amount, Guid expenseTypeId, DateTimeOffset? addedDate = null, Guid? aggregateId = null)
         {
             UserId = userId;
             Name = name;
             Amount = amount;
             ExpenseTypeId = expenseTypeId;
             AddedDate = addedDate ?? DateTimeOffset.Now;
+            AggregateId = aggregateId;
         }
 
         public Guid UserId { get; }
@@ -57,5 +73,7 @@ namespace BillTracker.Commands
         public Guid ExpenseTypeId { get; }
 
         public DateTimeOffset AddedDate { get; }
+
+        public Guid? AggregateId { get; }
     }
 }

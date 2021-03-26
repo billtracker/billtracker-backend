@@ -8,15 +8,7 @@ namespace BillTracker.Entities
         public Guid Id { get; private set; }
 
         [Required]
-        public Guid UserId { get; private set; }
-
-        public User User { get; private set; }
-
-        [Required]
         public string Name { get; private set; }
-
-        [Required]
-        public DateTimeOffset AddedDate { get; private set; }
 
         [Required]
         public decimal Amount { get; private set; }
@@ -26,19 +18,21 @@ namespace BillTracker.Entities
 
         public ExpenseType ExpenseType { get; private set; }
 
+        public Guid? AggregateId { get; private set; }
+
+        public ExpensesAggregate Aggregate { get; private set; }
+
         public static Expense Create(
-            Guid userId,
             string name,
             decimal amount,
-            DateTimeOffset addedAt,
-            Guid expenseTypeId) => new Expense
+            Guid expenseTypeId,
+            Guid? aggregateId = null) => new Expense
             {
                 Id = Guid.NewGuid(),
-                UserId = userId,
                 Name = name,
                 Amount = amount,
-                AddedDate = addedAt,
                 ExpenseTypeId = expenseTypeId,
+                AggregateId = aggregateId,
             };
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BillTracker.Api.Models;
 using BillTracker.Commands;
@@ -26,7 +25,7 @@ namespace BillTracker.Api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ExpenseTypeModel>> Post(AddExpenseRequest request)
+        public async Task<ActionResult<ExpenseTypeModel>> Post(CreateExpenseTypeRequest request)
         {
             var result = await _createExpenseType.Handle(new CreateExpenseTypeParameters(this.GetUserId(), request.Name));
 

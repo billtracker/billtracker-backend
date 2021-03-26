@@ -70,7 +70,8 @@ namespace BillTracker.Api.Controllers
         public async Task<ActionResult<Guid>> Post(AddExpenseRequest request)
         {
             var result = await _addExpenseHandler.Handle(
-                new AddExpenseParameters(this.GetUserId(), request.Name, request.Amount, request.ExpenseTypeId.Value, request.AddedDate));
+                new AddExpenseParameters(
+                    this.GetUserId(), request.Name, request.Amount, request.ExpenseTypeId.Value, request.AddedDate, request.AggregateId));
 
             return result.Match<ActionResult>(
                 success => Ok(result.Result),

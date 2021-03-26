@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using BillTracker.Commands;
 using BillTracker.Entities;
+using BillTracker.Queries;
 using BillTracker.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,14 +39,56 @@ namespace BillTracker.Tests.Commands
         }
 
         [Fact]
-        public async Task UserCanAddExpenseWithCustomType()
+        public async Task CannotAddExpenseWhenTypeDoesNotExist()
         {
             var sut = _factory.Services.GetRequiredService<AddExpense>();
 
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, Guid.NewGuid()));
+
+            result.IsError.Should().BeTrue();
+            result.Error.Should().Be(AddExpense.ExpenseTypeNotExist);
+        }
+
+        [Fact]
+        public async Task UserCanAddExpenseWithCustomType()
+        {
+            var sut = _factory.Services.GetRequiredService<AddExpense>();
+            var query = _factory.Services.GetRequiredService<ExpensesQuery>();
+
             var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id));
+            var addedExpense = await query.GetById(result.Result);
 
             result.IsError.Should().BeFalse();
             result.Result.Should().NotBeEmpty();
+            addedExpense.UserId.Should().Be(TestUser.Id);
+            addedExpense.ExpenseTypeName.Should().Be(TestExpenseType.Name);
+            addedExpense.Amount.Should().Be(20);
+        }
+
+        [Fact]
+        public async Task AddingExpenseWithoutAggregateIdCreatesNewAggregateWithSameNameAsExpense()
+        {
+            var sut = _factory.Services.GetRequiredService<AddExpense>();
+            var query = _factory.Services.GetRequiredService<ExpensesQuery>();
+
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id));
+            var addedExpense = await query.GetById(result.Result);
+
+            result.IsError.Should().BeFalse();
+            result.Result.Should().NotBeEmpty();
+            addedExpense.AggregateId.Should().NotBeEmpty();
+            addedExpense.AggregateName.Should().Be(addedExpense.Name);
+        }
+
+        [Fact]
+        public async Task AddingExpenseWithNoExistingAggregateReturnsError()
+        {
+            var sut = _factory.Services.GetRequiredService<AddExpense>();
+
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id, aggregateId: Guid.NewGuid()));
+
+            result.IsError.Should().BeTrue();
+            result.Error.Should().Be(CommonErrors.ExpenseAggregateDoesNotExist);
         }
     }
 }

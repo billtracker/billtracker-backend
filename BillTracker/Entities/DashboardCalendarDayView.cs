@@ -4,7 +4,7 @@ namespace BillTracker.Entities
 {
     internal class DashboardCalendarDayView
     {
-        public Guid AddedById { get; private set; }
+        public Guid UserId { get; private set; }
 
         public DateTime AddedAt { get; private set; }
 
