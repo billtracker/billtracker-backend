@@ -25,8 +25,6 @@ namespace BillTracker.Entities
 
         public RefreshToken RefreshToken { get; private set; }
 
-        public IEnumerable<Expense> Expenses { get; private set; }
-
         [Required]
         public bool WasSetup { get; private set; }
 

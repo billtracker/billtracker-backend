@@ -3,15 +3,17 @@ using System;
 using BillTracker.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace BillTracker.Migrations
 {
     [DbContext(typeof(BillTrackerContext))]
-    partial class BillTrackerContextModelSnapshot : ModelSnapshot
+    [Migration("20210326104030_ExpenseAggregateIdIsRequired")]
+    partial class ExpenseAggregateIdIsRequired
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,11 +55,16 @@ namespace BillTracker.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AggregateId");
 
                     b.HasIndex("ExpenseTypeId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Expenses");
                 });
@@ -187,6 +194,10 @@ namespace BillTracker.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BillTracker.Entities.User", null)
+                        .WithMany("Expenses")
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Aggregate");
 
                     b.Navigation("ExpenseType");
@@ -204,7 +215,7 @@ namespace BillTracker.Migrations
             modelBuilder.Entity("BillTracker.Entities.ExpensesAggregate", b =>
                 {
                     b.HasOne("BillTracker.Entities.User", "User")
-                        .WithMany("ExpenseAggregates")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -235,7 +246,7 @@ namespace BillTracker.Migrations
 
             modelBuilder.Entity("BillTracker.Entities.User", b =>
                 {
-                    b.Navigation("ExpenseAggregates");
+                    b.Navigation("Expenses");
 
                     b.Navigation("RefreshToken");
                 });
