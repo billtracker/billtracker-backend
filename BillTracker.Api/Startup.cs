@@ -48,13 +48,16 @@ namespace BillTracker.Api
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "BillTracker");
                     c.RoutePrefix = string.Empty;
                 });
-
-                app.UseCors(build => build.AllowAnyOrigin());
             }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(p => p
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin());
 
             app.UseAuthentication();
             app.UseAuthorization();
