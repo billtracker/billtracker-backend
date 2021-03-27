@@ -1,4 +1,4 @@
-﻿namespace BillTracker.Shared
+﻿namespace BillTracker
 {
     public static class CommonErrors
     {
