@@ -2,6 +2,7 @@
 using BillTracker.Entities;
 using BillTracker.Identity;
 using BillTracker.Queries;
+using BillTracker.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,10 @@ namespace BillTracker.Modules
             services.ConfigureDatabase(configuration);
 
             services.AddConfiguration<IdentityConfiguration>(configuration, IdentityConfiguration.SectionName);
+            services.AddConfiguration<AzureConfiguration>(configuration, AzureConfiguration.SectionName);
 
             services.AddTransient<IIdentityService, IdentityService>();
+            services.AddTransient<IBillFileStorage, AzureBillBlobStorage>();
 
             // Commands
             services.AddTransient<AddExpense>();
@@ -29,6 +32,14 @@ namespace BillTracker.Modules
             services.AddTransient<ExpensesQuery>();
             services.AddTransient<ExpenseTypesQuery>();
             services.AddTransient<DashboardQuery>();
+
+            if (configuration.GetValue<bool>("InitializeOnStartup"))
+            {
+                var serviceProvider = services.BuildServiceProvider();
+                serviceProvider.GetService<BillTrackerContext>().Database.Migrate();
+
+                serviceProvider.InitializeServices(services);
+            }
 
             return services;
         }
@@ -65,12 +76,27 @@ namespace BillTracker.Modules
                     ServiceLifetime.Transient,
                     ServiceLifetime.Transient);
 
-            if (configuration.GetValue<bool>("MigrateDbOnStartup"))
+            return services;
+        }
+
+        private static void InitializeServices(this ServiceProvider serviceProvider, IServiceCollection services)
+        {
+            // Services to initialize
+
+            // Initialize those services
+            var servicesToInitialize = serviceProvider.GetServices<IInitializable>();
+            foreach (var service in servicesToInitialize)
             {
-                services.BuildServiceProvider().GetService<BillTrackerContext>().Database.Migrate();
+                service.Initialize();
             }
 
-            return services;
+            services.RemoveAll<IInitializable>();
+        }
+
+        private static void AddInitializable<TService>(this IServiceCollection services)
+            where TService : class, IInitializable
+        {
+            services.AddTransient<IInitializable, TService>();
         }
     }
 }
