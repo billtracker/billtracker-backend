@@ -26,6 +26,14 @@ services:
       - 5050:80
     restart: on-failure
 
+  blobstorage:
+    container_name: billtracker_blobstorage
+    image: mcr.microsoft.com/azure-storage/azurite
+    volumes:
+      - c:/azurite:/data mcr.microsoft.com/azure-storage/azurite
+    ports:
+      - 10000:10000
+
 volumes:
   db:
   pgadmin:

@@ -82,6 +82,7 @@ namespace BillTracker.Modules
         private static void InitializeServices(this ServiceProvider serviceProvider, IServiceCollection services)
         {
             // Services to initialize
+            services.AddInitializable<AzureBillBlobStorage>();
 
             // Initialize those services
             var servicesToInitialize = serviceProvider.GetServices<IInitializable>();
