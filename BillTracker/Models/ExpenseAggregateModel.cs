@@ -14,6 +14,7 @@ namespace BillTracker.Models
             UserId = entity.UserId;
             IsDraft = entity.IsDraft;
             Expenses = entity.Expenses.Select(x => new ExpenseModel(x));
+            Bills = entity.ExpenseBillFiles.Select(x => new ExpenseBillFileModel(x));
         }
 
         public Guid Id { get; }
@@ -33,5 +34,7 @@ namespace BillTracker.Models
         }
 
         public IEnumerable<ExpenseModel> Expenses { get; }
+
+        public IEnumerable<ExpenseBillFileModel> Bills { get; }
     }
 }

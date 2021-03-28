@@ -52,7 +52,7 @@ namespace BillTracker.Tests.Commands
             var result = await sut.Handle(new SaveExpenseAggregateParameters(Guid.NewGuid(), TestUser.Id, "name"));
 
             result.IsError.Should().BeTrue();
-            result.Error.Should().Be(CommonErrors.ExpenseAggregateDoesNotExist);
+            result.Error.Should().Be(CommonErrors.ExpenseAggregateNotFound);
         }
     }
 }

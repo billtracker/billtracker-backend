@@ -28,4 +28,14 @@
 		<ProjectReference Include="..\BillTracker\BillTracker.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="TestFiles\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="TestFiles\bill.jpg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

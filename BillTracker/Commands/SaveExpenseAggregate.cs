@@ -40,7 +40,7 @@ namespace BillTracker.Commands
             var aggregate = await _context.ExpensesAggregates.SingleOrDefaultAsync(x => x.Id == parameters.Id.Value);
             if (aggregate == null)
             {
-                return CommonErrors.ExpenseAggregateDoesNotExist;
+                return CommonErrors.ExpenseAggregateNotFound;
             }
 
             aggregate.Update(

@@ -18,6 +18,7 @@ namespace BillTracker.Entities
 
         public ExpenseType ExpenseType { get; private set; }
 
+        [Required]
         public Guid AggregateId { get; private set; }
 
         public ExpensesAggregate Aggregate { get; private set; }

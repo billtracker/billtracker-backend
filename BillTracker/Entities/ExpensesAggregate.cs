@@ -24,6 +24,8 @@ namespace BillTracker.Entities
         [Required]
         public bool IsDraft { get; private set; }
 
+        public ICollection<ExpenseBillFile> ExpenseBillFiles { get; private set; } = new List<ExpenseBillFile>();
+
         public static ExpensesAggregate Create(
             Guid userId,
             string name,

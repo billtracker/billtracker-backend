@@ -35,7 +35,7 @@ namespace BillTracker.Commands
             {
                 if (!await _context.ExpensesAggregates.AnyAsync(x => x.Id == input.AggregateId.Value))
                 {
-                    return CommonErrors.ExpenseAggregateDoesNotExist;
+                    return CommonErrors.ExpenseAggregateNotFound;
                 }
             }
             else

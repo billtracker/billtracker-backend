@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using BillTracker.Commands;
 using BillTracker.Entities;
 using BillTracker.Queries;
-using BillTracker.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -90,7 +89,7 @@ namespace BillTracker.Tests.Commands
             var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id, aggregateId: Guid.NewGuid()));
 
             result.IsError.Should().BeTrue();
-            result.Error.Should().Be(CommonErrors.ExpenseAggregateDoesNotExist);
+            result.Error.Should().Be(CommonErrors.ExpenseAggregateNotFound);
         }
 
         [Fact]

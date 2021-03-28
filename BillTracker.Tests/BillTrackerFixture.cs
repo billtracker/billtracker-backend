@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using BillTracker.Commands;
 using BillTracker.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -33,6 +33,15 @@ namespace BillTracker.Tests
             context.SaveChanges();
 
             return expenseType;
+        }
+
+        internal Expense CreateExpense(Guid userId)
+        {
+            var expenseType = CreateExpenseType(userId);
+            var addExpense = Factory.Services.GetRequiredService<AddExpense>();
+            var context = Factory.Services.GetRequiredService<BillTrackerContext>();
+            var expense = addExpense.Handle(new AddExpenseParameters(userId, "expense", 20, expenseType.Id)).GetAwaiter().GetResult();
+            return context.Expenses.Find(expense.Result);
         }
     }
 }

@@ -17,6 +17,8 @@ namespace BillTracker.Entities
 
         internal virtual DbSet<Expense> Expenses { get; set; }
 
+        internal virtual DbSet<ExpenseBillFile> ExpenseBills { get; set; }
+
         internal virtual DbSet<ExpenseType> ExpenseTypes { get; set; }
 
         internal virtual DbSet<DashboardCalendarDayView> DashboardCalendarDays { get; set; }
@@ -50,6 +52,13 @@ namespace BillTracker.Entities
                 type.HasMany(x => x.Expenses)
                     .WithOne(x => x.ExpenseType)
                     .HasForeignKey(x => x.ExpenseTypeId);
+            });
+
+            modelBuilder.Entity<ExpenseBillFile>(bill =>
+            {
+                bill.HasOne(x => x.Aggregate)
+                    .WithMany(x => x.ExpenseBillFiles)
+                    .HasForeignKey(x => x.AggregateId);
             });
 
             modelBuilder.Entity<DashboardCalendarDayView>(calendarDay =>
