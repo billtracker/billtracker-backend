@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace BillTracker.Entities
 {
@@ -19,12 +20,12 @@ namespace BillTracker.Entities
         [Required]
         public DateTimeOffset AddedDate { get; private set; }
 
-        public IEnumerable<Expense> Expenses { get; private set; } = new List<Expense>();
+        public IEnumerable<Expense> Expenses { get; private set; }
 
         [Required]
         public bool IsDraft { get; private set; }
 
-        public IEnumerable<ExpenseBillFile> ExpenseBillFiles { get; private set; } = new List<ExpenseBillFile>();
+        public IEnumerable<ExpenseBillFile> ExpenseBillFiles { get; private set; }
 
         public static ExpensesAggregate Create(
             Guid userId,
@@ -37,6 +38,8 @@ namespace BillTracker.Entities
                 Name = name,
                 AddedDate = addedDate,
                 IsDraft = isDraft,
+                Expenses = new List<Expense>(),
+                ExpenseBillFiles = new List<ExpenseBillFile>(),
             };
 
         public void Update(

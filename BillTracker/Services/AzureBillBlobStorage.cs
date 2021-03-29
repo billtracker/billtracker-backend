@@ -36,13 +36,14 @@ namespace BillTracker.Services
                 new BlobClientOptions(BlobClientOptions.ServiceVersion.V2019_12_12));
 
             await blobClient.UploadAsync(parameters.File);
-            return blobClient.Uri;
+            return new Uri(blobClient.Uri.ToString().Replace("%2F", "/"));
         }
 
         private static string GetBlobName(UploadBillBlob parameters) =>
-            Path.Combine(
-                parameters.UserId.ToString(),
-                parameters.AggregateId.ToString(),
+            string.Join(
+                separator: '/',
+                parameters.UserId,
+                parameters.AggregateId,
                 parameters.FileName);
     }
 }

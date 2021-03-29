@@ -67,7 +67,7 @@ namespace BillTracker.Api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Guid>> Post(AddExpenseRequest request)
+        public async Task<ActionResult<ExpenseModel>> Post(AddExpenseRequest request)
         {
             var result = await _addExpenseHandler.Handle(
                 new AddExpenseParameters(

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BillTracker.Entities;
+using BillTracker.Models;
 using BillTracker.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +18,7 @@ namespace BillTracker.Commands
             _context = context;
         }
 
-        public async Task<ResultOrError<Guid>> Handle(AddExpenseParameters input)
+        public async Task<ResultOrError<ExpenseModel>> Handle(AddExpenseParameters input)
         {
             if (!await _context.DoesExist<User>(input.UserId))
             {
@@ -49,7 +50,7 @@ namespace BillTracker.Commands
             await _context.Expenses.AddAsync(newExpense);
             await _context.SaveChangesAsync();
 
-            return newExpense.Id;
+            return new ExpenseModel(newExpense);
         }
     }
 

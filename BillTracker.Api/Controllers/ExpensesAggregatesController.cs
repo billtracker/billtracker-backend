@@ -17,11 +17,16 @@ namespace BillTracker.Api.Controllers
     {
         private readonly SaveExpenseAggregate _saveExpenseAggregate;
         private readonly ExpensesQuery _expensesQuery;
+        private readonly UploadBillFile _uploadBillFile;
 
-        public ExpensesAggregatesController(SaveExpenseAggregate saveExpenseAggregate, ExpensesQuery expensesQuery)
+        public ExpensesAggregatesController(
+            SaveExpenseAggregate saveExpenseAggregate,
+            ExpensesQuery expensesQuery,
+            UploadBillFile uploadBillFile)
         {
             _saveExpenseAggregate = saveExpenseAggregate;
             _expensesQuery = expensesQuery;
+            _uploadBillFile = uploadBillFile;
         }
 
         [HttpPut]
@@ -73,6 +78,24 @@ namespace BillTracker.Api.Controllers
                 pageSize: pageSize.Value,
                 fromDate: fromDate,
                 toDate: toDate);
+
+            return result.Match<ActionResult>(
+                success => Ok(success),
+                error => BadRequest(error));
+        }
+
+        [HttpPost]
+        [Route("upload-bill")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<ExpenseBillFileModel>> UploadBillFile([FromForm] UploadBillFileRequest request)
+        {
+            using var file = request.File.OpenReadStream();
+            var result = await _uploadBillFile.Handle(new AddBillFileParameters(
+                this.GetUserId(),
+                request.AggregateId.Value,
+                file,
+                request.File.FileName));
 
             return result.Match<ActionResult>(
                 success => Ok(success),

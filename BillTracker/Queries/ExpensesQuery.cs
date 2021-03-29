@@ -67,7 +67,8 @@ namespace BillTracker.Queries
         {
             var result = await _context.ExpensesAggregates
                 .Include(x => x.Expenses)
-                .ThenInclude(x => x.ExpenseType)
+                    .ThenInclude(x => x.ExpenseType)
+                .Include(x => x.ExpenseBillFiles)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(x => x.Id == aggregateId);
             return result == null ? null : new ExpenseAggregateModel(result);
@@ -82,7 +83,8 @@ namespace BillTracker.Queries
 
             var baseQuery = _context.ExpensesAggregates
                 .Include(x => x.Expenses)
-                .ThenInclude(x => x.ExpenseType)
+                    .ThenInclude(x => x.ExpenseType)
+                .Include(x => x.ExpenseBillFiles)
                 .Where(x => x.UserId == userId);
 
             if (fromDate.HasValue)

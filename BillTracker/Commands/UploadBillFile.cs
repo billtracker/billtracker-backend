@@ -59,8 +59,6 @@ namespace BillTracker.Commands
             await _context.ExpenseBills.AddAsync(entity);
             await _context.SaveChangesAsync();
 
-            await parameters.File.DisposeAsync();
-
             return new ExpenseBillFileModel(entity);
         }
     }

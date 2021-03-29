@@ -42,7 +42,7 @@ namespace BillTracker.Tests.Queries
             var dashboard = await sut.GetDashboard(TestUser.Id);
 
             dashboard.IsError.Should().BeFalse();
-            dashboard.Result.Metrics.MostExpensive.Id.Should().Be(mostExpensive.Result);
+            dashboard.Result.Metrics.MostExpensive.Id.Should().Be(mostExpensive.Result.Id);
             dashboard.Result.Metrics.Tranfers.Should().Be(4);
             dashboard.Result.Metrics.Total.Should().Be(100);
         }
@@ -78,7 +78,7 @@ namespace BillTracker.Tests.Queries
             var dashboard = await sut.GetDashboard(TestUser.Id, DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddDays(1));
 
             dashboard.IsError.Should().BeFalse();
-            dashboard.Result.Metrics.MostExpensive.Id.Should().Be(mostExpensiveWithinFilter.Result);
+            dashboard.Result.Metrics.MostExpensive.Id.Should().Be(mostExpensiveWithinFilter.Result.Id);
             dashboard.Result.Metrics.Tranfers.Should().Be(2);
             dashboard.Result.Metrics.Total.Should().Be(30);
         }

@@ -55,13 +55,11 @@ namespace BillTracker.Tests.Commands
             var query = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id));
-            var addedExpense = await query.GetById(result.Result);
+            var addedExpense = await query.GetById(result.Result.Id);
 
             result.IsError.Should().BeFalse();
-            result.Result.Should().NotBeEmpty();
-            addedExpense.UserId.Should().Be(TestUser.Id);
             addedExpense.Name.Should().Be("name");
-            addedExpense.ExpenseTypeName.Should().Be(TestExpenseType.Name);
+            addedExpense.ExpenseTypeId.Should().Be(TestExpenseType.Id);
             addedExpense.Amount.Should().Be(20);
         }
 
@@ -72,11 +70,10 @@ namespace BillTracker.Tests.Commands
             var query = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id));
-            var addedExpense = await query.GetById(result.Result);
+            var addedExpense = await query.GetById(result.Result.Id);
             var aggregate = await query.GetExpensesAggregate(addedExpense.AggregateId);
 
             result.IsError.Should().BeFalse();
-            result.Result.Should().NotBeEmpty();
             addedExpense.AggregateId.Should().NotBeEmpty();
             aggregate.Name.Should().Be("name");
         }
@@ -101,7 +98,7 @@ namespace BillTracker.Tests.Commands
             var sut = _factory.Services.GetRequiredService<AddExpense>();
 
             var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id, aggregateId: aggregate.Result));
-            var addedExpense = await queryExpense.GetById(result.Result);
+            var addedExpense = await queryExpense.GetById(result.Result.Id);
 
             result.IsError.Should().BeFalse();
             addedExpense.Should().NotBeNull();

@@ -55,10 +55,10 @@ namespace BillTracker.Tests.Queries
             result.IsError.Should().BeFalse();
             result.Result.TotalItems.Should().Be(3);
             result.Result.Items.Count().Should().Be(3);
-            result.Result.Items.Should().Contain(x => x.Id == expense1.Result);
-            result.Result.Items.Should().Contain(x => x.Id == expense2.Result);
-            result.Result.Items.Should().Contain(x => x.Id == expense3.Result);
-            result.Result.Items.Should().NotContain(x => x.Id == expense4.Result);
+            result.Result.Items.Should().Contain(x => x.Id == expense1.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense2.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense3.Result.Id);
+            result.Result.Items.Should().NotContain(x => x.Id == expense4.Result.Id);
         }
 
         [Fact]
@@ -76,10 +76,10 @@ namespace BillTracker.Tests.Queries
             result.IsError.Should().BeFalse();
             result.Result.TotalItems.Should().Be(4);
             result.Result.Items.Count().Should().Be(4);
-            result.Result.Items.Should().Contain(x => x.Id == expense1.Result);
-            result.Result.Items.Should().Contain(x => x.Id == expense2.Result);
-            result.Result.Items.Should().Contain(x => x.Id == expense3.Result);
-            result.Result.Items.Should().Contain(x => x.Id == expense4.Result);
+            result.Result.Items.Should().Contain(x => x.Id == expense1.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense2.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense3.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense4.Result.Id);
         }
 
         [Fact]
@@ -97,10 +97,10 @@ namespace BillTracker.Tests.Queries
             result.IsError.Should().BeFalse();
             result.Result.TotalItems.Should().Be(4);
             result.Result.Items.Count().Should().Be(2);
-            result.Result.Items.Should().Contain(x => x.Id == expense1.Result);
-            result.Result.Items.Should().Contain(x => x.Id == expense2.Result);
-            result.Result.Items.Should().NotContain(x => x.Id == expense3.Result);
-            result.Result.Items.Should().NotContain(x => x.Id == expense4.Result);
+            result.Result.Items.Should().Contain(x => x.Id == expense1.Result.Id);
+            result.Result.Items.Should().Contain(x => x.Id == expense2.Result.Id);
+            result.Result.Items.Should().NotContain(x => x.Id == expense3.Result.Id);
+            result.Result.Items.Should().NotContain(x => x.Id == expense4.Result.Id);
         }
 
         [Fact]
@@ -119,10 +119,26 @@ namespace BillTracker.Tests.Queries
             result.IsError.Should().BeFalse();
             result.Result.TotalItems.Should().Be(3);
             result.Result.Items.Count().Should().Be(3);
-            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense1.Result) && agg.TotalAmount == 10);
-            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense2.Result) && agg.TotalAmount == 20);
-            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense3.Result) && agg.TotalAmount == 30);
-            result.Result.Items.All(agg => !agg.Expenses.Any(x => x.Id == expense4.Result)).Should().BeTrue();
+            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense1.Result.Id) && agg.TotalAmount == 10);
+            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense2.Result.Id) && agg.TotalAmount == 20);
+            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense3.Result.Id) && agg.TotalAmount == 30);
+            result.Result.Items.All(agg => !agg.Expenses.Any(x => x.Id == expense4.Result.Id)).Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task WhenGetExpensesAggregateThenReturnsProperValues()
+        {
+            var expense = _fixture.CreateExpense(TestUser.Id, "name");
+            var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
+
+            var result = await sut.GetExpensesAggregate(expense.AggregateId);
+
+            result.Should().NotBeNull();
+            result.UserId.Should().Be(TestUser.Id);
+            result.Name.Should().Be("name");
+            result.IsDraft.Should().BeFalse();
+            result.Expenses.Should().ContainSingle();
+            result.Bills.Should().BeEmpty();
         }
     }
 }
