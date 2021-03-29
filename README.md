@@ -17,30 +17,25 @@ run the app: either locally or in Docker.
     - [Visual Studio Code](https://code.visualstudio.com/)
 
 ## 3. Docker
-For local development purposes all instances can be contenerized using Docker. to set up infrastructure and optionally the application (for the frontend development).
+For local development purposes the whole infrastructure and WebAPI are contenerized using Docker.
 
 ## 4. Build & Run
 
-### Infrastructure (for Backend contributors):
+``` bash
+./run.sh [--full-app --tests]
+```
+
+Optional parameters:
+* --full-app - Runs BillTracker WebAPI (for Frontend devs)
+    * _Endpoint of the WebAPI (also Swagger when using browser): http://localhost:5000_
+* --tests - Runs all possible tests
+
+## 5. BillTracker elements
 
 Infrastructure elements:
 - PostgreSQL
 - pgAdmin4
 - [Azurite (Azure Storage emulator)](https://docs.microsoft.com/pl-pl/azure/storage/common/storage-use-azurite)
-
-```bash
-docker-compose up -d
-```
-
-
-### Infrastructure with application (for Frontend devs):
-Setting up the whole infrastracture with application or restarting the app after introducing some changes, can be done by running the command below.
-
-```bash
-docker-compose -f docker-compose.test.yml up -d --build
-```
-
-Endpoint of the backend app (also Swagger when using browser): http://localhost:5000.
 
 ### pgAdmin4
 "pgAdmin is the most popular and feature rich Open Source administration and development platform for PostgreSQL, the most advanced Open Source database in the world."
@@ -49,6 +44,8 @@ The pgAdmin4 tool can be open in the browser under the link http://localhost:505
 - Email: pgadmin4@pgadmin.org
 - Password: admin
 
-_Sometimes an error is shown with some message about "CSRF token". Ignore it, and hit the "Login" button until you are logged in._
+!!! Warnings Below !!!
 
-In case the popup with database password is shown, put "123456", check "Save password" and confirm. This is done once and each time after docker volumes are removed.
+_1. Sometimes an error is shown with some message about "CSRF token". Ignore it, and hit the "Login" button until you are logged in._
+
+_2. In case the popup with database password is shown, put "123456", check "Save password" and confirm. This is done once and each time after docker volumes are removed._
