@@ -36,9 +36,11 @@ namespace BillTracker.Modules
 
             if (configuration.GetValue<bool>("InitializeOnStartup"))
             {
-                var serviceProvider = services.BuildServiceProvider();
-                serviceProvider.GetService<BillTrackerContext>().Database.Migrate();
+                // Services to initialize
+                services.AddInitializable<DbInitializer>();
+                services.AddInitializable<AzureBillBlobStorage>();
 
+                var serviceProvider = services.BuildServiceProvider();
                 serviceProvider.InitializeServices(services);
             }
 
@@ -82,10 +84,6 @@ namespace BillTracker.Modules
 
         private static void InitializeServices(this ServiceProvider serviceProvider, IServiceCollection services)
         {
-            // Services to initialize
-            services.AddInitializable<AzureBillBlobStorage>();
-
-            // Initialize those services
             var servicesToInitialize = serviceProvider.GetServices<IInitializable>();
             foreach (var service in servicesToInitialize)
             {
