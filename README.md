@@ -22,7 +22,7 @@ For local development purposes the whole infrastructure and WebAPI are conteneri
 ## 4. Build & Run
 
 ``` bash
-./run.sh [--full-app --tests]
+./run.sh
 ```
 
 Optional parameters:
