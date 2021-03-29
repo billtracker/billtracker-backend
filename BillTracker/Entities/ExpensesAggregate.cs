@@ -19,12 +19,12 @@ namespace BillTracker.Entities
         [Required]
         public DateTimeOffset AddedDate { get; private set; }
 
-        public ICollection<Expense> Expenses { get; private set; } = new List<Expense>();
+        public IEnumerable<Expense> Expenses { get; private set; } = new List<Expense>();
 
         [Required]
         public bool IsDraft { get; private set; }
 
-        public ICollection<ExpenseBillFile> ExpenseBillFiles { get; private set; } = new List<ExpenseBillFile>();
+        public IEnumerable<ExpenseBillFile> ExpenseBillFiles { get; private set; } = new List<ExpenseBillFile>();
 
         public static ExpensesAggregate Create(
             Guid userId,

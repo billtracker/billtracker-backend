@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using BillTracker.Entities;
 using BillTracker.Models;
@@ -45,7 +46,7 @@ namespace BillTracker.Commands
                 return CommonErrors.ExpenseAggregateNotFound;
             }
 
-            var fileName = $"{aggregate.ExpenseBillFiles.Count}-{parameters.FileName}";
+            var fileName = $"{aggregate.ExpenseBillFiles.Count()}-{parameters.FileName}";
             var fileUri = await _billFileStorage.Upload(
                 new UploadBillBlob(
                     file: parameters.File,
