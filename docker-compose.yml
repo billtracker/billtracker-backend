@@ -33,6 +33,7 @@ services:
       - c:/azurite:/data mcr.microsoft.com/azure-storage/azurite
     ports:
       - 10000:10000
+    restart: on-failure
 
 volumes:
   db:
