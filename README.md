@@ -26,6 +26,7 @@ For local development purposes all instances can be contenerized using Docker. t
 Infrastructure elements:
 - PostgreSQL
 - pgAdmin4
+- [Azurite (Azure Storage emulator)](https://docs.microsoft.com/pl-pl/azure/storage/common/storage-use-azurite)
 
 ```bash
 docker-compose up -d
