@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BillTracker.Commands
 {
-    public class AddExpenseBillFile
+    public class UploadBillFile
     {
         public const string BillFileIsEmpty = "Sent file is empty.";
         public const string BillFileIsTooBig = "Sent file is too big.";
@@ -20,7 +20,7 @@ namespace BillTracker.Commands
         private readonly BillTrackerContext _context;
         private readonly IBillFileStorage _billFileStorage;
 
-        public AddExpenseBillFile(BillTrackerContext context, IBillFileStorage billFileStorage)
+        public UploadBillFile(BillTrackerContext context, IBillFileStorage billFileStorage)
         {
             _context = context;
             _billFileStorage = billFileStorage;

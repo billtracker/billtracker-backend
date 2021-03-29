@@ -10,7 +10,7 @@ using Xunit;
 
 namespace BillTracker.Tests.Commands
 {
-    public class AddExpenseBillFileTests : IClassFixture<BillTrackerFixture>
+    public class UploadBillFileTests : IClassFixture<BillTrackerFixture>
     {
         private readonly BillTrackerWebApplicationFactory _factory;
         private readonly BillTrackerFixture _fixture;
@@ -18,7 +18,7 @@ namespace BillTracker.Tests.Commands
         private readonly User TestUser;
         private readonly Expense TestExpense;
 
-        public AddExpenseBillFileTests(BillTrackerFixture fixture)
+        public UploadBillFileTests(BillTrackerFixture fixture)
         {
             _fixture = fixture;
             _factory = fixture.GetWebApplicationFactory();
@@ -30,7 +30,7 @@ namespace BillTracker.Tests.Commands
         [Fact]
         public async Task CanUploadBillFile()
         {
-            var sut = _factory.Services.GetRequiredService<AddExpenseBillFile>();
+            var sut = _factory.Services.GetRequiredService<UploadBillFile>();
 
             var result = await sut.Handle(new AddBillFileParameters(TestUser.Id, TestExpense.AggregateId, GetTestFile("bill.jpg"), "bill.jpg"));
 
@@ -42,23 +42,23 @@ namespace BillTracker.Tests.Commands
         [Fact]
         public async Task CannotUploadFileBiggerThan10MB()
         {
-            var sut = _factory.Services.GetRequiredService<AddExpenseBillFile>();
+            var sut = _factory.Services.GetRequiredService<UploadBillFile>();
 
             var result = await sut.Handle(new AddBillFileParameters(Guid.NewGuid(), Guid.NewGuid(), new FakeStream(size: 1000000000), null));
 
             result.IsError.Should().BeTrue();
-            result.Error.Should().Be(AddExpenseBillFile.BillFileIsTooBig);
+            result.Error.Should().Be(UploadBillFile.BillFileIsTooBig);
         }
 
         [Fact]
         public async Task FileMustBeProvided()
         {
-            var sut = _factory.Services.GetRequiredService<AddExpenseBillFile>();
+            var sut = _factory.Services.GetRequiredService<UploadBillFile>();
 
             var result = await sut.Handle(new AddBillFileParameters(Guid.NewGuid(), Guid.NewGuid(), null, null));
 
             result.IsError.Should().BeTrue();
-            result.Error.Should().Be(AddExpenseBillFile.BillFileIsEmpty);
+            result.Error.Should().Be(UploadBillFile.BillFileIsEmpty);
         }
 
         private static FileStream GetTestFile(string testFileName) => File.OpenRead(Path.Combine("TestFiles", testFileName));

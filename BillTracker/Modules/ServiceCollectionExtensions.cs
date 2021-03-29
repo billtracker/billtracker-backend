@@ -24,7 +24,7 @@ namespace BillTracker.Modules
 
             // Commands
             services.AddTransient<AddExpense>();
-            services.AddTransient<AddExpenseBillFile>();
+            services.AddTransient<UploadBillFile>();
             services.AddTransient<CreateExpenseType>();
             services.AddTransient<SetupNewUser>();
             services.AddTransient<SaveExpenseAggregate>();
