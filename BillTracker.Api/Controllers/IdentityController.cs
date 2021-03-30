@@ -25,7 +25,7 @@ namespace BillTracker.Api.Controllers
         [HttpPost("user/register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Register(RegisterRequest request)
+        public async Task<ActionResult<RegisterResponse>> Register(RegisterRequest request)
         {
             var result = await _identityService.Register(
                 emailAddress: request.EmailAddress,
@@ -33,7 +33,7 @@ namespace BillTracker.Api.Controllers
                 userName: request.UserName);
 
             return result.Match<ActionResult>(
-                success => Ok(),
+                success => Ok(new RegisterResponse(request.EmailAddress, request.UserName)),
                 error => BadRequest(error));
         }
 
