@@ -52,14 +52,14 @@ namespace BillTracker.Models
 
         public class DashboardExpenseTypeModel
         {
-            public DashboardExpenseTypeModel(Guid expenseTypeId, string expenseTypeName, decimal total)
+            public DashboardExpenseTypeModel(Guid? expenseTypeId, string expenseTypeName, decimal total)
             {
                 ExpenseTypeId = expenseTypeId;
                 ExpenseTypeName = expenseTypeName;
                 Total = total;
             }
 
-            public Guid ExpenseTypeId { get; }
+            public Guid? ExpenseTypeId { get; }
 
             public string ExpenseTypeName { get; }
 

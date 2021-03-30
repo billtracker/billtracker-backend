@@ -33,17 +33,17 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGet_GivenNoFilters_ThenReturnsMetricsFromAllPeriod()
         {
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
-            var mostExpensive = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
+            var mostExpensive = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
             var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(TestUser.Id);
 
             dashboard.IsError.Should().BeFalse();
             dashboard.Result.Metrics.MostExpensive.Id.Should().Be(mostExpensive.Result.Id);
-            dashboard.Result.Metrics.Tranfers.Should().Be(4);
+            dashboard.Result.Metrics.Tranfers.Should().Be(5);
             dashboard.Result.Metrics.Total.Should().Be(100);
         }
 
@@ -51,28 +51,30 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGet_GivenNoFilters_ThenReturnsExpenseTypesFromAllPeriod()
         {
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, TestExpenseType2.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, TestExpenseType2.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 50, addedDate: DateTimeOffset.Now.AddDays(1)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, expenseTypeId: TestExpenseType2.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, expenseTypeId: TestExpenseType2.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
             var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(TestUser.Id, DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddDays(2));
 
             dashboard.IsError.Should().BeFalse();
-            dashboard.Result.ExpenseTypes.Should().HaveCount(2);
+            dashboard.Result.ExpenseTypes.Should().HaveCount(3);
             dashboard.Result.ExpenseTypes.Should().Contain(x => x.ExpenseTypeId == TestExpenseType1.Id && x.Total == 30);
             dashboard.Result.ExpenseTypes.Should().Contain(x => x.ExpenseTypeId == TestExpenseType2.Id && x.Total == 30);
+            dashboard.Result.ExpenseTypes.Should().Contain(x => !x.ExpenseTypeId.HasValue && x.Total == 50);
         }
 
         [Fact]
         public async Task WhenGet_GivenDateFilters_ThenReturnsFilteredMetrics()
         {
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
-            var mostExpensiveWithinFilter = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
+            var mostExpensiveWithinFilter = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
             var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(TestUser.Id, DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddDays(1));
@@ -87,10 +89,10 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGet_ThenReturnsCalendarDays()
         {
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, TestExpenseType2.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, TestExpenseType2.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType1.Id, addedDate: DateTimeOffset.Now));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, expenseTypeId: TestExpenseType2.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, expenseTypeId: TestExpenseType2.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
             var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(TestUser.Id);
@@ -105,10 +107,10 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGet_GivenDateFilters_ThenReturnsFilteredExpenseTypes()
         {
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType1.Id));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, TestExpenseType2.Id));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, TestExpenseType2.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, expenseTypeId: TestExpenseType1.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType1.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, expenseTypeId: TestExpenseType2.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, expenseTypeId: TestExpenseType2.Id));
             var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(TestUser.Id);
@@ -140,10 +142,10 @@ namespace BillTracker.Tests.Queries
             var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
             var saveAggregate = _factory.Services.GetRequiredService<SaveExpenseAggregate>();
             var draftAggregate = await saveAggregate.Handle(new SaveExpenseAggregateParameters(null, TestUser.Id, "aggregate", isDraft: true));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, TestExpenseType1.Id));
-            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 100, TestExpenseType1.Id, aggregateId: draftAggregate.Result));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, expenseTypeId: TestExpenseType1.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, expenseTypeId: TestExpenseType1.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, expenseTypeId: TestExpenseType1.Id));
+            await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 100, expenseTypeId: TestExpenseType1.Id, aggregateId: draftAggregate.Result));
             var sut = _factory.Services.GetRequiredService<DashboardQuery>();
 
             var dashboard = await sut.GetDashboard(TestUser.Id);

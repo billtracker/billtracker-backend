@@ -14,7 +14,6 @@ namespace BillTracker.Api.Models
 
         public DateTimeOffset? AddedDate { get; set; }
 
-        [Required]
         public Guid? ExpenseTypeId { get; set; }
     }
 }

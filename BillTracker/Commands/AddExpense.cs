@@ -25,7 +25,7 @@ namespace BillTracker.Commands
                 return CommonErrors.UserNotExist;
             }
 
-            if (!await _context.DoesExist<ExpenseType>(input.ExpenseTypeId))
+            if (input.ExpenseTypeId.HasValue && !await _context.DoesExist<ExpenseType>(input.ExpenseTypeId.Value))
             {
                 return ExpenseTypeNotExist;
             }
@@ -46,7 +46,7 @@ namespace BillTracker.Commands
                 aggregateId = aggregate.Id;
             }
 
-            newExpense = Expense.Create(input.Name, input.Amount, input.ExpenseTypeId, aggregateId.Value);
+            newExpense = Expense.Create(input.Name, input.Amount, aggregateId.Value, input.ExpenseTypeId);
             await _context.Expenses.AddAsync(newExpense);
             await _context.SaveChangesAsync();
 
@@ -57,7 +57,12 @@ namespace BillTracker.Commands
     public class AddExpenseParameters
     {
         public AddExpenseParameters(
-            Guid userId, string name, decimal amount, Guid expenseTypeId, DateTimeOffset? addedDate = null, Guid? aggregateId = null)
+            Guid userId,
+            string name,
+            decimal amount,
+            DateTimeOffset? addedDate = null,
+            Guid? aggregateId = null,
+            Guid? expenseTypeId = null)
         {
             UserId = userId;
             Name = name;
@@ -73,7 +78,7 @@ namespace BillTracker.Commands
 
         public decimal Amount { get; }
 
-        public Guid ExpenseTypeId { get; }
+        public Guid? ExpenseTypeId { get; }
 
         public DateTimeOffset AddedDate { get; }
 

@@ -13,8 +13,7 @@ namespace BillTracker.Entities
         [Required]
         public decimal Amount { get; private set; }
 
-        [Required]
-        public Guid ExpenseTypeId { get; private set; }
+        public Guid? ExpenseTypeId { get; private set; }
 
         public ExpenseType ExpenseType { get; private set; }
 
@@ -26,8 +25,8 @@ namespace BillTracker.Entities
         public static Expense Create(
             string name,
             decimal amount,
-            Guid expenseTypeId,
-            Guid aggregateId) => new Expense
+            Guid aggregateId,
+            Guid? expenseTypeId = null) => new Expense
             {
                 Id = Guid.NewGuid(),
                 Name = name,

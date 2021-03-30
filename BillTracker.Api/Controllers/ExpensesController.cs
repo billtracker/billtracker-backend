@@ -71,7 +71,12 @@ namespace BillTracker.Api.Controllers
         {
             var result = await _addExpenseHandler.Handle(
                 new AddExpenseParameters(
-                    this.GetUserId(), request.Name, request.Amount, request.ExpenseTypeId.Value, request.AddedDate, request.AggregateId));
+                    this.GetUserId(),
+                    request.Name,
+                    request.Amount,
+                    request.AddedDate,
+                    aggregateId: request.AggregateId,
+                    expenseTypeId: request.ExpenseTypeId));
 
             return result.Match<ActionResult>(
                 success => Ok(result.Result),

@@ -20,7 +20,7 @@ namespace BillTracker.Models
 
         public decimal Amount { get; }
 
-        public Guid ExpenseTypeId { get; }
+        public Guid? ExpenseTypeId { get; }
 
         public Guid AggregateId { get; }
     }

@@ -31,7 +31,7 @@ namespace BillTracker.Tests.Commands
         {
             var sut = _factory.Services.GetRequiredService<AddExpense>();
 
-            var result = await sut.Handle(new AddExpenseParameters(Guid.NewGuid(), "name", 20, Guid.NewGuid()));
+            var result = await sut.Handle(new AddExpenseParameters(Guid.NewGuid(), "name", 20));
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(CommonErrors.UserNotExist);
@@ -42,7 +42,7 @@ namespace BillTracker.Tests.Commands
         {
             var sut = _factory.Services.GetRequiredService<AddExpense>();
 
-            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, Guid.NewGuid()));
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: Guid.NewGuid()));
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(AddExpense.ExpenseTypeNotExist);
@@ -54,7 +54,7 @@ namespace BillTracker.Tests.Commands
             var sut = _factory.Services.GetRequiredService<AddExpense>();
             var query = _factory.Services.GetRequiredService<ExpensesQuery>();
 
-            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id));
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType.Id));
             var addedExpense = await query.GetById(result.Result.Id);
 
             result.IsError.Should().BeFalse();
@@ -64,12 +64,27 @@ namespace BillTracker.Tests.Commands
         }
 
         [Fact]
+        public async Task UserCanAddExpenseWithoutType()
+        {
+            var sut = _factory.Services.GetRequiredService<AddExpense>();
+            var query = _factory.Services.GetRequiredService<ExpensesQuery>();
+
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20));
+            var addedExpense = await query.GetById(result.Result.Id);
+
+            result.IsError.Should().BeFalse();
+            addedExpense.Name.Should().Be("name");
+            addedExpense.ExpenseTypeId.Should().BeNull();
+            addedExpense.Amount.Should().Be(20);
+        }
+
+        [Fact]
         public async Task AddingExpenseWithoutAggregateIdCreatesNewAggregateWithSameNameAsExpense()
         {
             var sut = _factory.Services.GetRequiredService<AddExpense>();
             var query = _factory.Services.GetRequiredService<ExpensesQuery>();
 
-            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id));
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType.Id));
             var addedExpense = await query.GetById(result.Result.Id);
             var aggregate = await query.GetExpensesAggregate(addedExpense.AggregateId);
 
@@ -83,7 +98,7 @@ namespace BillTracker.Tests.Commands
         {
             var sut = _factory.Services.GetRequiredService<AddExpense>();
 
-            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id, aggregateId: Guid.NewGuid()));
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType.Id, aggregateId: Guid.NewGuid()));
 
             result.IsError.Should().BeTrue();
             result.Error.Should().Be(CommonErrors.ExpenseAggregateNotFound);
@@ -97,7 +112,7 @@ namespace BillTracker.Tests.Commands
             var aggregate = await saveAggregate.Handle(new SaveExpenseAggregateParameters(null, TestUser.Id, "agg"));
             var sut = _factory.Services.GetRequiredService<AddExpense>();
 
-            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, TestExpenseType.Id, aggregateId: aggregate.Result));
+            var result = await sut.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType.Id, aggregateId: aggregate.Result));
             var addedExpense = await queryExpense.GetById(result.Result.Id);
 
             result.IsError.Should().BeFalse();

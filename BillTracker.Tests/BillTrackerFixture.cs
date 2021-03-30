@@ -40,7 +40,7 @@ namespace BillTracker.Tests
             var expenseType = CreateExpenseType(userId);
             var addExpense = Factory.Services.GetRequiredService<AddExpense>();
             var context = Factory.Services.GetRequiredService<BillTrackerContext>();
-            var expense = addExpense.Handle(new AddExpenseParameters(userId, name, 20, expenseType.Id)).GetAwaiter().GetResult();
+            var expense = addExpense.Handle(new AddExpenseParameters(userId, name, 20, expenseTypeId: expenseType.Id)).GetAwaiter().GetResult();
             return context.Expenses.Find(expense.Result.Id);
         }
     }
