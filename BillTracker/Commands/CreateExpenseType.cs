@@ -37,7 +37,7 @@ namespace BillTracker.Commands
             await _context.ExpenseTypes.AddAsync(type);
             await _context.SaveChangesAsync();
 
-            return new ExpenseTypeModel(type);
+            return type.ToModel();
         }
     }
 

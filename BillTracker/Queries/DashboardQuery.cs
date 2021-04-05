@@ -30,14 +30,19 @@ namespace BillTracker.Queries
             var stats = await GetStatisticsFilteredByDate(userId, fromDate, toDate);
             var calendar = await GetCalendar(userId);
 
-            return new Dashboard(stats.Metrics, calendar, stats.ExpenseTypes);
+            return new Dashboard
+            {
+                Metrics = stats.Metrics,
+                ExpenseTypes = stats.ExpenseTypes,
+                Calendar = calendar,
+            };
         }
 
         private static async Task<MetricsModel> GetMetrics(IQueryable<Expense> baseQuery)
         {
             var mostExpensive = await baseQuery
                 .OrderByDescending(x => x.Amount)
-                .Select(x => new ExpenseModel(x))
+                .Select(x => x.ToModel())
                 .FirstOrDefaultAsync();
 
             var peakStats = await baseQuery
@@ -50,10 +55,12 @@ namespace BillTracker.Queries
                     })
                 .SingleOrDefaultAsync();
 
-            return new MetricsModel(
-                total: peakStats?.Total ?? default,
-                transfers: peakStats?.Transfers ?? default,
-                mostExpensive: mostExpensive);
+            return new MetricsModel
+            {
+                Total = peakStats?.Total ?? default,
+                Tranfers = peakStats?.Transfers ?? default,
+                MostExpensive = mostExpensive,
+            };
         }
 
         private static async Task<IReadOnlyList<DashboardExpenseTypeModel>> GetExpenseTypes(IQueryable<Expense> baseQuery)
@@ -61,10 +68,12 @@ namespace BillTracker.Queries
             var result = await baseQuery
                 .GroupBy(
                     x => new { Id = x.ExpenseTypeId, x.ExpenseType.Name },
-                    (key, types) => new DashboardExpenseTypeModel(
-                        key.Id,
-                        key.Name,
-                        types.Sum(x => x.Amount)))
+                    (key, types) => new DashboardExpenseTypeModel
+                    {
+                        ExpenseTypeId = key.Id,
+                        ExpenseTypeName = key.Name,
+                        Total = types.Sum(x => x.Amount),
+                    })
                 .ToListAsync();
 
             return result;
@@ -92,7 +101,11 @@ namespace BillTracker.Queries
         {
             var result = await _context.DashboardCalendarDays
                 .Where(x => x.UserId == userId)
-                .Select(x => new CalendarDayModel(x.AddedDate, x.TotalAmount))
+                .Select(x => new CalendarDayModel
+                {
+                    Day = x.AddedDate,
+                    Total = x.TotalAmount,
+                })
                 .ToListAsync();
 
             return result;

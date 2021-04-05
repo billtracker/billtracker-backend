@@ -50,7 +50,7 @@ namespace BillTracker.Commands
             await _context.Expenses.AddAsync(newExpense);
             await _context.SaveChangesAsync();
 
-            return new ExpenseModel(newExpense);
+            return newExpense.ToModel();
         }
     }
 

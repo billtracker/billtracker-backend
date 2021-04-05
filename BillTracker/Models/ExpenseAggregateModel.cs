@@ -5,25 +5,15 @@ using BillTracker.Entities;
 
 namespace BillTracker.Models
 {
-    public class ExpenseAggregateModel
+    public record ExpenseAggregateModel
     {
-        internal ExpenseAggregateModel(ExpensesAggregate entity)
-        {
-            Id = entity.Id;
-            Name = entity.Name;
-            UserId = entity.UserId;
-            IsDraft = entity.IsDraft;
-            Expenses = entity.Expenses.Select(x => new ExpenseModel(x));
-            Bills = entity.ExpenseBillFiles.Select(x => new ExpenseBillFileModel(x));
-        }
+        public Guid Id { get; init; }
 
-        public Guid Id { get; }
+        public string Name { get; init; }
 
-        public string Name { get; }
+        public Guid UserId { get; init; }
 
-        public Guid UserId { get; }
-
-        public bool IsDraft { get; }
+        public bool IsDraft { get; init; }
 
         public decimal TotalAmount
         {
@@ -33,8 +23,8 @@ namespace BillTracker.Models
             }
         }
 
-        public IEnumerable<ExpenseModel> Expenses { get; }
+        public IEnumerable<ExpenseModel> Expenses { get; init; }
 
-        public IEnumerable<ExpenseBillFileModel> Bills { get; }
+        public IEnumerable<ExpenseBillFileModel> Bills { get; init; }
     }
 }

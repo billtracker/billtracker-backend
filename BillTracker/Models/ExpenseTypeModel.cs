@@ -1,21 +1,13 @@
 ﻿using System;
-using BillTracker.Entities;
 
 namespace BillTracker.Models
 {
-    public class ExpenseTypeModel
+    public record ExpenseTypeModel
     {
-        internal ExpenseTypeModel(ExpenseType expenseType)
-        {
-            Id = expenseType.Id;
-            UserId = expenseType.UserId;
-            Name = expenseType.Name;
-        }
+        public Guid Id { get; init; }
 
-        public Guid Id { get; }
+        public Guid? UserId { get; init; }
 
-        public Guid? UserId { get; }
-
-        public string Name { get; }
+        public string Name { get; init; }
     }
 }

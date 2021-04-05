@@ -22,7 +22,7 @@ namespace BillTracker.Queries
         {
             var result = await _context.ExpenseTypes
                 .Where(x => x.UserId == userId)
-                .Select(x => new ExpenseTypeModel(x))
+                .Select(x => x.ToModel())
                 .ToListAsync();
 
             return result;
@@ -32,7 +32,7 @@ namespace BillTracker.Queries
         {
             var result = await _context.ExpenseTypes
                 .Where(x => x.IsDefault)
-                .Select(x => new ExpenseTypeModel(x))
+                .Select(x => x.ToModel())
                 .ToListAsync();
 
             return result;

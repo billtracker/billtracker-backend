@@ -67,7 +67,12 @@ namespace BillTracker.Identity
 
             await _setupNewUser.Handle(user.Id);
 
-            return new AuthenticationResult(jwt.AccessToken, refreshToken.Token, jwt.ExpiresAt);
+            return new AuthenticationResult
+            {
+                AccessToken = jwt.AccessToken,
+                RefreshToken = refreshToken.Token,
+                ExpiresAt = jwt.ExpiresAt,
+            };
         }
 
         public async Task<ResultOrError<AuthenticationResult>> RefreshToken(string refreshToken)
@@ -88,7 +93,12 @@ namespace BillTracker.Identity
 
             await _context.SaveChangesAsync();
 
-            return new AuthenticationResult(newJwt.AccessToken, newRefreshToken.Token, newJwt.ExpiresAt);
+            return new AuthenticationResult
+            {
+                AccessToken = newJwt.AccessToken,
+                RefreshToken = newRefreshToken.Token,
+                ExpiresAt = newJwt.ExpiresAt,
+            };
         }
 
         public async Task<SuccessOrError> Register(string emailAddress, string password, string userName)

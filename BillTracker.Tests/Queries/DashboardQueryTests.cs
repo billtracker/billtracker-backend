@@ -43,7 +43,7 @@ namespace BillTracker.Tests.Queries
 
             dashboard.IsError.Should().BeFalse();
             dashboard.Result.Metrics.MostExpensive.Id.Should().Be(mostExpensive.Result.Id);
-            dashboard.Result.Metrics.Tranfers.Should().Be(5);
+            dashboard.Result.Metrics.Tranfers.Should().Be(4);
             dashboard.Result.Metrics.Total.Should().Be(100);
         }
 

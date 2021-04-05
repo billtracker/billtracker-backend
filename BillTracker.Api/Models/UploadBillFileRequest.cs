@@ -7,9 +7,9 @@ namespace BillTracker.Api.Models
     public class UploadBillFileRequest
     {
         [Required]
-        public Guid? AggregateId { get; set; }
+        public Guid? AggregateId { get; init; }
 
         [Required]
-        public IFormFile File { get; set; }
+        public IFormFile File { get; init; }
     }
 }

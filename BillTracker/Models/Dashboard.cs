@@ -3,67 +3,37 @@ using System.Collections.Generic;
 
 namespace BillTracker.Models
 {
-    public class Dashboard
+    public record Dashboard
     {
-        public Dashboard(
-            MetricsModel metrics,
-            IReadOnlyList<CalendarDayModel> calendar,
-            IReadOnlyList<DashboardExpenseTypeModel> expenseTypes)
+        public MetricsModel Metrics { get; init; }
+
+        public IReadOnlyList<CalendarDayModel> Calendar { get; init; }
+
+        public IReadOnlyList<DashboardExpenseTypeModel> ExpenseTypes { get; init; }
+
+        public record MetricsModel
         {
-            Metrics = metrics;
-            Calendar = calendar;
-            ExpenseTypes = expenseTypes;
+            public decimal Total { get; init; }
+
+            public int Tranfers { get; init; }
+
+            public ExpenseModel MostExpensive { get; init; }
         }
 
-        public MetricsModel Metrics { get; }
-
-        public IReadOnlyList<CalendarDayModel> Calendar { get; }
-
-        public IReadOnlyList<DashboardExpenseTypeModel> ExpenseTypes { get; }
-
-        public class MetricsModel
+        public record CalendarDayModel
         {
-            public MetricsModel(decimal total, int transfers, ExpenseModel mostExpensive)
-            {
-                Total = total;
-                Tranfers = transfers;
-                MostExpensive = mostExpensive;
-            }
+            public DateTime Day { get; init; }
 
-            public decimal Total { get; }
-
-            public int Tranfers { get; }
-
-            public ExpenseModel MostExpensive { get; }
+            public decimal Total { get; init; }
         }
 
-        public class CalendarDayModel
+        public record DashboardExpenseTypeModel
         {
-            public CalendarDayModel(DateTime day, decimal total)
-            {
-                Day = day;
-                Total = total;
-            }
+            public Guid? ExpenseTypeId { get; init; }
 
-            public DateTime Day { get; }
+            public string ExpenseTypeName { get; init; }
 
-            public decimal Total { get; }
-        }
-
-        public class DashboardExpenseTypeModel
-        {
-            public DashboardExpenseTypeModel(Guid? expenseTypeId, string expenseTypeName, decimal total)
-            {
-                ExpenseTypeId = expenseTypeId;
-                ExpenseTypeName = expenseTypeName;
-                Total = total;
-            }
-
-            public Guid? ExpenseTypeId { get; }
-
-            public string ExpenseTypeName { get; }
-
-            public decimal Total { get; }
+            public decimal Total { get; init; }
         }
     }
 }

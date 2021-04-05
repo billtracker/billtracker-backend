@@ -2,31 +2,18 @@
 
 namespace BillTracker.Api.Models.Identity
 {
-    public class RegisterRequest
+    public record RegisterRequest
     {
         [Required]
         [EmailAddress]
-        public string EmailAddress { get; set; }
+        public string EmailAddress { get; init; }
 
         [Required]
         [MinLength(5)]
-        public string Password { get; set; }
+        public string Password { get; init; }
 
         [Required]
         [MinLength(2)]
-        public string UserName { get; set; }
-    }
-
-    public class RegisterResponse
-    {
-        public RegisterResponse(string emailAddress, string userName)
-        {
-            EmailAddress = emailAddress;
-            UserName = userName;
-        }
-
-        public string EmailAddress { get; }
-
-        public string UserName { get; }
+        public string UserName { get; init; }
     }
 }

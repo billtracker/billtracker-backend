@@ -3,17 +3,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BillTracker.Api.Models
 {
-    public class AddExpenseRequest
+    public record AddExpenseRequest
     {
-        public Guid? AggregateId { get; set; }
+        public Guid? AggregateId { get; init; }
 
         [Required]
-        public string Name { get; set; }
+        public string Name { get; init; }
 
-        public decimal Amount { get; set; }
+        public decimal Amount { get; init; }
 
-        public DateTimeOffset? AddedDate { get; set; }
+        public DateTimeOffset? AddedDate { get; init; }
 
-        public Guid? ExpenseTypeId { get; set; }
+        public Guid? ExpenseTypeId { get; init; }
     }
 }

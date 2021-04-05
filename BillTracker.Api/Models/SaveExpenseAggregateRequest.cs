@@ -2,14 +2,14 @@
 
 namespace BillTracker.Api.Models
 {
-    public class SaveExpenseAggregateRequest
+    public record SaveExpenseAggregateRequest
     {
-        public Guid? Id { get; set; }
+        public Guid? Id { get; init; }
 
-        public DateTimeOffset? AddedDate { get; set; }
+        public DateTimeOffset? AddedDate { get; init; }
 
-        public string Name { get; set; }
+        public string Name { get; init; }
 
-        public bool IsDraft { get; set; }
+        public bool IsDraft { get; init; }
     }
 }

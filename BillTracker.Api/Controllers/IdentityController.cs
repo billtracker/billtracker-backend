@@ -33,7 +33,11 @@ namespace BillTracker.Api.Controllers
                 userName: request.UserName);
 
             return result.Match<ActionResult>(
-                success => Ok(new RegisterResponse(request.EmailAddress, request.UserName)),
+                success => Ok(new RegisterResponse
+                {
+                    EmailAddress = request.EmailAddress,
+                    UserName = request.UserName,
+                }),
                 error => BadRequest(error));
         }
 

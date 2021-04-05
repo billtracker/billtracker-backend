@@ -25,7 +25,7 @@ namespace BillTracker.Queries
                 .Include(x => x.ExpenseType)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(x => x.Id == id);
-            return result == null ? null : new ExpenseModel(result);
+            return result == null ? null : result.ToModel();
         }
 
         public async Task<ResultOrError<PagedResult<ExpenseModel>>> GetMany(Guid userId, int pageNumber, int pageSize = 50, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null)
@@ -56,7 +56,7 @@ namespace BillTracker.Queries
                 : await baseQuery.OrderByDescending(x => x.Aggregate.AddedDate)
                                  .Skip((pageNumber - 1) * pageSize)
                                  .Take(pageSize)
-                                 .Select(x => new ExpenseModel(x))
+                                 .Select(x => x.ToModel())
                                  .ToListAsync();
 
             return ResultOrError<PagedResult<ExpenseModel>>.FromResult(
@@ -71,7 +71,7 @@ namespace BillTracker.Queries
                 .Include(x => x.ExpenseBillFiles)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(x => x.Id == aggregateId);
-            return result == null ? null : new ExpenseAggregateModel(result);
+            return result == null ? null : result.ToModel();
         }
 
         public async Task<ResultOrError<PagedResult<ExpenseAggregateModel>>> GetManyExpensesAggregate(Guid userId, int pageNumber, int pageSize = 50, DateTimeOffset? fromDate = null, DateTimeOffset? toDate = null)
@@ -103,7 +103,7 @@ namespace BillTracker.Queries
                 : await baseQuery.OrderByDescending(x => x.AddedDate)
                                  .Skip((pageNumber - 1) * pageSize)
                                  .Take(pageSize)
-                                 .Select(x => new ExpenseAggregateModel(x))
+                                 .Select(x => x.ToModel())
                                  .ToListAsync();
 
             return ResultOrError<PagedResult<ExpenseAggregateModel>>.FromResult(

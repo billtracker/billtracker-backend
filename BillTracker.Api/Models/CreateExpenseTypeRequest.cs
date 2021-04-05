@@ -2,9 +2,9 @@
 
 namespace BillTracker.Api.Models
 {
-    public class CreateExpenseTypeRequest
+    public record CreateExpenseTypeRequest
     {
         [Required]
-        public string Name { get; set; }
+        public string Name { get; init; }
     }
 }

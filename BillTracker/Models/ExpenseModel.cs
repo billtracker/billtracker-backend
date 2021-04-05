@@ -1,27 +1,17 @@
 ﻿using System;
-using BillTracker.Entities;
 
 namespace BillTracker.Models
 {
-    public class ExpenseModel
+    public record ExpenseModel
     {
-        internal ExpenseModel(Expense expense)
-        {
-            Id = expense.Id;
-            Name = expense.Name;
-            Amount = expense.Amount;
-            ExpenseTypeId = expense.ExpenseTypeId;
-            AggregateId = expense.AggregateId;
-        }
+        public Guid Id { get; init; }
 
-        public Guid Id { get; }
+        public string Name { get; init; }
 
-        public string Name { get; }
+        public decimal Amount { get; init; }
 
-        public decimal Amount { get; }
+        public Guid? ExpenseTypeId { get; init; }
 
-        public Guid? ExpenseTypeId { get; }
-
-        public Guid AggregateId { get; }
+        public Guid AggregateId { get; init; }
     }
 }
