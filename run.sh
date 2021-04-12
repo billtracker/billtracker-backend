@@ -36,7 +36,7 @@ while [[ $# > 0 ]]; do
 done
 
 
-docker-compose -f "$composeFilesPath/docker-compose.infrastructure.yml" $webApi up -d
+docker-compose -f "$composeFilesPath/docker-compose.infrastructure.yml" $webApi up -d --build
 
 if [ "$runTests" = true ] ; then
     ASPNETCORE_ENVIRONMENT=Development
