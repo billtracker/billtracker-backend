@@ -1,5 +1,7 @@
 # Bill Tracker - Backend
 
+[![BillTracker WebApi CD](https://github.com/billtracker/billtracker-backend/actions/workflows/cd.yml/badge.svg)](https://github.com/billtracker/billtracker-backend/actions/workflows/cd.yml)
+
 ## 1. Introduction
 This project contains whole Backend part the is required for BillTracker application, including auth, user management and expenses calculations.
 
@@ -17,17 +19,19 @@ run the app: either locally or in Docker.
     - [Visual Studio Code](https://code.visualstudio.com/)
 
 ## 3. Docker
-For local development purposes the whole infrastructure and WebAPI are contenerized using Docker.
+For local development purposes the whole infrastructure and WebAPI are containerized using Docker.
 
-## 4. Build & Run
+## 4. Local development
+
+Command below creates only the required infrastructure.
 
 ``` bash
 ./run.sh
 ```
 
 Optional parameters:
-* --full-app - Runs BillTracker WebAPI (for Frontend devs)
-    * _Endpoint of the WebAPI (also Swagger when using browser): http://localhost:5000_
+* --full-app - Additionally containerize the BillTracker WebAPI (for Frontend devs)
+    * _WebAPI's address (also Swagger when using browser): http://localhost:5000_
 * --tests - Runs all possible tests
 
 ## 5. BillTracker elements
