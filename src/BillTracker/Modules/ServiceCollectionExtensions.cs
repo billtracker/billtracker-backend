@@ -14,6 +14,8 @@ namespace BillTracker.Modules
     {
         public static IServiceCollection ConfigureBaseServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddHttpClient();
+
             services.ConfigureDatabase(configuration);
 
             services.AddConfiguration<IdentityConfiguration>(configuration, IdentityConfiguration.SectionName);
