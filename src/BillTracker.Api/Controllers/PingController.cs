@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BillTracker.Api.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("ping")]
     public class PingController : ControllerBase
