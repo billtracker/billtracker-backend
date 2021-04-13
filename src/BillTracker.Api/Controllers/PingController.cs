@@ -11,11 +11,5 @@ namespace BillTracker.Api.Controllers
         {
             return Ok();
         }
-
-        [HttpGet("test2")]
-        public ActionResult Get2()
-        {
-            return Ok();
-        }
     }
 }
