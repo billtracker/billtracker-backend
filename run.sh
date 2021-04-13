@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+exec 3>&1 # keep near the start of the script
+function say () {
+  printf "%b\n" "[run] $1" >&3
+}
+
 # https://stackoverflow.com/a/20901614
 function dir_resolve() {
   local dir=`dirname "$1"`
@@ -35,10 +40,12 @@ while [[ $# > 0 ]]; do
   esac
 done
 
-
+say "Run locally"
 docker-compose -f "$composeFilesPath/docker-compose.infrastructure.yml" $webApi up -d --build
 
 if [ "$runTests" = true ] ; then
-    ASPNETCORE_ENVIRONMENT=Development
-    dotnet test 
+  say "Run tests"
+
+  ASPNETCORE_ENVIRONMENT=Development
+  dotnet test 
 fi;

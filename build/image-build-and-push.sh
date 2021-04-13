@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+exec 3>&1 # keep near the start of the script
+function say () {
+  printf "%b\n" "[image-build-and-push] $1" >&3
+}
+
 # https://stackoverflow.com/a/20901614
 function dir_resolve() {
   local dir=`dirname "$1"`
@@ -34,8 +39,10 @@ while [[ $# > 0 ]]; do
   esac
 done
 
+say "Building Docker image"
 docker build -t "jaceks2106/billtracker-api:latest" -f $dockerFilePath $dockerContextPath
 
-if [ "noPublish" = false ] ; then
-    docker push "jaceks2106/billtracker-api:latest"
+if [ "$noPublish" = false ] ; then
+  say "Pushing Docker image"
+  docker push "jaceks2106/billtracker-api:latest"
 fi;
