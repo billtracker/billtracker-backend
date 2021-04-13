@@ -1,5 +1,7 @@
 # Bill Tracker - Backend
 
+[![BillTracker WebApi CD](https://github.com/billtracker/billtracker-backend/actions/workflows/cd.yml/badge.svg)](https://github.com/billtracker/billtracker-backend/actions/workflows/cd.yml)
+
 ## 1. Introduction
 This project contains whole Backend part the is required for BillTracker application, including auth, user management and expenses calculations.
 
