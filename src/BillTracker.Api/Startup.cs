@@ -1,4 +1,5 @@
 using BillTracker.Api.Modules;
+using BillTracker.Api.Recaptcha;
 using BillTracker.Modules;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,6 +34,8 @@ namespace BillTracker.Api
             services.ConfigureAuthentication(Configuration);
             services.ConfigureSwaggerGen();
 
+            services.AddConfiguration<RecaptchaConfiguration>(Configuration, RecaptchaConfiguration.SectionName);
+
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
         }
 
@@ -58,6 +61,8 @@ namespace BillTracker.Api
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowAnyOrigin());
+
+            app.UseMiddleware<RecaptchaMiddleware>();
 
             app.UseAuthentication();
             app.UseAuthorization();
