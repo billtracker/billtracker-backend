@@ -22,9 +22,20 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 dockerContextPath=$(dir_resolve "$SCRIPT_DIR/../src")
 dockerFilePath=$(dir_resolve "$SCRIPT_DIR/../src/BillTracker.Api/Dockerfile")
 
-echo $dockerContextPath
-echo $dockerFilePath
+noPublish=true
+
+while [[ $# > 0 ]]; do
+  case "$1" in
+
+    --no-publish) noPublish=false; shift ;;
+
+    -*) echo "unknown option: $1" >&2; exit 1;;
+    *) echo "unknown argument: $1" >&2; exit 1;;
+  esac
+done
 
 docker build -t "jaceks2106/billtracker-api:latest" -f $dockerFilePath $dockerContextPath
 
-docker push "jaceks2106/billtracker-api:latest"
+if [ "noPublish" = false ] ; then
+    docker push "jaceks2106/billtracker-api:latest"
+fi;
