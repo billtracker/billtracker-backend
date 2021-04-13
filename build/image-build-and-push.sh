@@ -19,8 +19,8 @@ function dir_resolve() {
 # The full path to this script. https://stackoverflow.com/a/246128
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-dockerContextPath=$(dir_resolve "$SCRIPT_DIR/..")
-dockerFilePath=$(dir_resolve "$SCRIPT_DIR/../BillTracker.Api/Dockerfile")
+dockerContextPath=$(dir_resolve "$SCRIPT_DIR/../src")
+dockerFilePath=$(dir_resolve "$SCRIPT_DIR/../src/BillTracker.Api/Dockerfile")
 
 echo $dockerContextPath
 echo $dockerFilePath
