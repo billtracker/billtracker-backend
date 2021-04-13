@@ -31,6 +31,9 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    - name: Set scripts permissions
+      run: chmod +x ./build/*.sh
+
     - name: Build
       if: GITHUB.REF != 'refs/heads/main'
       run: ./build/image-build-and-push.sh --no-publish
