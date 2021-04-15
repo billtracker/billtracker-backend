@@ -3,7 +3,7 @@ set -euo pipefail
 
 exec 3>&1 # keep near the start of the script
 function say () {
-  printf "%b\n" "[image-build-and-push] $1" >&3
+  printf "%b\n" "[build] $1" >&3
 }
 
 # https://stackoverflow.com/a/20901614
@@ -27,22 +27,33 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 dockerContextPath=$(dir_resolve "$SCRIPT_DIR/../src")
 dockerFilePath=$(dir_resolve "$SCRIPT_DIR/../src/BillTracker.Api/Dockerfile")
 
-noPublish=false
+dockerRepoName="jaceks2106/billtracker-api"
+
+version='v0.0.1-dev'
 
 while [[ $# > 0 ]]; do
   case "$1" in
 
-    --no-publish) noPublish=true; shift ;;
+    --version=*) version="${1#*=}"; shift 1;;
 
     -*) echo "unknown option: $1" >&2; exit 1;;
     *) echo "unknown argument: $1" >&2; exit 1;;
   esac
 done
 
-say "Building Docker image"
-docker build -t "jaceks2106/billtracker-api:latest" -f $dockerFilePath $dockerContextPath
+say "Version: '$version'"
 
-if [ "$noPublish" = false ] ; then
-  say "Pushing Docker image"
-  docker push "jaceks2106/billtracker-api:latest"
+# do not create any docker tag if version is wrong, e.g. 'master', '123'
+versionTagOption="-t $dockerRepoName:$version"
+if [[ ! "$version" =~ ^v[0-9]+\.[0-9]+\. ]]; then
+  versionTagOption=''
 fi;
+
+# 'latest' version is only when version is Release, e.g. 'v1.0.0'
+latestTagOption=''
+if [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then 
+  latestTagOption="-t $dockerRepoName:latest"
+fi;
+
+say "Building Docker image"
+docker build $latestTagOption $versionTagOption -f $dockerFilePath $dockerContextPath

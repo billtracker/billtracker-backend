@@ -5,13 +5,10 @@ on:
 
   push:
     branches: [ main ]
-    paths: 
-    - 'src/**'
+    tags: [ 'v*.*.*' ]
     
   pull_request:
     branches: [ main ]
-    paths: 
-    - 'src/**'
 
 jobs:
   build:
@@ -21,11 +18,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Set variables
+      run: |
+        echo ::set-output name=tag::${GITHUB_REF#refs/tags/}
+
     - name: Azure Login
       uses: Azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
     
     - name: Docker Login
       uses: docker/login-action@v1.8.0
@@ -37,16 +37,8 @@ jobs:
       run: chmod +x ./build/*.sh
 
     - name: Build
-      if: GITHUB.REF != 'refs/heads/main'
-      run: ./build/image-build-and-push.sh --no-publish
-
-    - name: Build & Publish Image
-      if: GITHUB.REF == 'refs/heads/main' && startsWith(GITHUB.REF, 'refs/tags/v')
-      run: ./build/image-build-and-push.sh
+      run: ./build/build.sh --version=${{ steps.vars.outputs.tag }}
 
     - name: Release
-      if: GITHUB.REF == 'refs/heads/main' && startsWith(GITHUB.REF, 'refs/tags/v')
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-          az webapp restart --name billtracker-api-dev --resource-group billtracker-api-dev --subscription a08721a6-b871-437b-9b3b-b64c0beec2b7
+      if: startsWith(GITHUB.REF, 'refs/tags/')
+      run: ./build/release.sh --version=${{ steps.vars.outputs.tag }}
