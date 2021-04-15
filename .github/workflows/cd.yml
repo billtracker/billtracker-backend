@@ -1,16 +1,13 @@
 name: BillTracker WebApi CD
 
 env:
-  IS_RELEASE: GITHUB.REF == 'refs/heads/main' && startsWith(GITHUB.REF, 'refs/tags/v')
-  TAG: ${{ github.event.release.tag_name }}
+  IS_RELEASE: startsWith(GITHUB.REF, 'refs/tags/v')
 
 on: 
   workflow_dispatch:
 
   push:
-    branches: [ main ]
-    paths: 
-    - 'src/**'
+    tags: [ 'v*.*.*' ]
     
   pull_request:
     branches: [ main ]
@@ -23,16 +20,21 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: print script
+    - name: Set output
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+    - name: Check output
+      env:
+        RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
       run: |
-        echo ${{ GITHUB.REF }}
-        echo ${GITHUB_REF#refs/*/}
+        echo $RELEASE_VERSION
+        echo ${{ steps.vars.outputs.tag }}
 
     - name: Azure Login
       uses: Azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
     
     - name: Docker Login
       uses: docker/login-action@v1.8.0
@@ -49,7 +51,7 @@ jobs:
 
     - name: Build & Publish Image
       if: ${{ env.IS_RELEASE == true }}
-      run: ./build/image-build-and-push.sh --release-tag v1.0.0
+      run: ./build/image-build-and-push.sh --release-tag=${{ steps.vars.outputs.tag }}
 
     - name: Release
       if: ${{ env.IS_RELEASE == true }}
