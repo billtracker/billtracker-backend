@@ -40,11 +40,11 @@ jobs:
       run: ./build/image-build-and-push.sh --no-publish
 
     - name: Build & Publish Image
-      if: GITHUB.REF == 'refs/heads/main'
+      if: GITHUB.REF == 'refs/heads/main' && GITHUB.REF == 'refs/tags/release*'
       run: ./build/image-build-and-push.sh
 
     - name: Release
-      if: GITHUB.REF == 'refs/heads/main'
+      if: GITHUB.REF == 'refs/heads/main' && GITHUB.REF == 'refs/tags/release*'
       uses: azure/CLI@v1
       with:
         inlineScript: |
