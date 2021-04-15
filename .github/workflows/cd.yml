@@ -30,6 +30,8 @@ jobs:
       run: |
         echo $RELEASE_VERSION
         echo ${{ steps.vars.outputs.tag }}
+        echo ${{ env.IS_RELEASE }}
+        echo ${{ GITHUB.REF }}
 
     - name: Azure Login
       uses: Azure/login@v1
