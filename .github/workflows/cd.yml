@@ -26,7 +26,7 @@ jobs:
     - name: print script
       run: |
         echo ${{ GITHUB.REF }}
-        echo ${{ env.TAG }}
+        echo ${GITHUB_REF#refs/*/}
 
     - name: Azure Login
       uses: Azure/login@v1
