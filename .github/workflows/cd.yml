@@ -1,12 +1,13 @@
 name: BillTracker WebApi CD
 
 env:
-  IS_RELEASE: startsWith(GITHUB.REF, 'refs/tags/v')
+  IS_RELEASE: 
 
 on: 
   workflow_dispatch:
 
   push:
+    branches: [ main ]
     tags: [ 'v*.*.*' ]
     
   pull_request:
@@ -22,16 +23,11 @@ jobs:
 
     - name: Set output
       id: vars
-      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/}
 
     - name: Check output
-      env:
-        RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
       run: |
-        echo $RELEASE_VERSION
         echo ${{ steps.vars.outputs.tag }}
-        echo ${{ env.IS_RELEASE }}
-        echo ${{ GITHUB.REF }}
 
     - name: Azure Login
       uses: Azure/login@v1
@@ -47,16 +43,15 @@ jobs:
     - name: Set scripts permissions
       run: chmod +x ./build/*.sh
 
-    - name: Build
-      if: ${{ env.IS_RELEASE == false }}
-      run: ./build/image-build-and-push.sh
+    # - name: Build
+    #   if: ${{ !startsWith(steps.vars.outputs.tag, 'v') }}
+    #   run: ./build/image-build-and-push.sh
 
     - name: Build & Publish Image
-      if: ${{ env.IS_RELEASE == true }}
       run: ./build/image-build-and-push.sh --release-tag=${{ steps.vars.outputs.tag }}
 
     - name: Release
-      if: ${{ env.IS_RELEASE == true }}
+      if: ${{ startsWith(steps.vars.outputs.tag, 'v') }}
       uses: azure/CLI@v1
       with:
         inlineScript: |
