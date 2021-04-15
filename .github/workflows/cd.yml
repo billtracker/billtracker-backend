@@ -1,8 +1,5 @@
 name: BillTracker WebApi CD
 
-env:
-  IS_RELEASE: 
-
 on: 
   workflow_dispatch:
 
@@ -21,14 +18,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set output
-      id: vars
-      run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/}
-
-    - name: Check output
+    - name: Set variables
       run: |
-        echo ${{ steps.vars.outputs.tag }}
-        echo ${GITHUB_REF#refs/tags/}
+        echo ::set-output name=tag::${GITHUB_REF#refs/tags/}
 
     - name: Azure Login
       uses: Azure/login@v1
@@ -48,5 +40,5 @@ jobs:
       run: ./build/build.sh --version=${{ steps.vars.outputs.tag }}
 
     - name: Release
-      if: ${{ startsWith(steps.vars.outputs.tag, 'v') }}
+      if: startsWith(GITHUB.REF, 'refs/tags/')
       run: ./build/release.sh --version=${{ steps.vars.outputs.tag }}
