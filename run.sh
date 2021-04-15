@@ -32,7 +32,7 @@ runTests=false
 while [[ $# > 0 ]]; do
   case "$1" in
 
-    --full-app) webApi="-f $composeFilesPath/docker-compose.webapi.yml"; shift ;;
+    --full-app) webApi="-f docker-compose.webapi.yml"; shift ;;
     --tests) runTests=true; shift ;;
 
     -*) echo "unknown option: $1" >&2; exit 1;;
@@ -40,8 +40,10 @@ while [[ $# > 0 ]]; do
   esac
 done
 
+cd $composeFilesPath
+
 say "Run locally"
-docker-compose -f "$composeFilesPath/docker-compose.infrastructure.yml" $webApi up -d --build
+docker-compose -f "docker-compose.infrastructure.yml" $webApi up -d --build
 
 if [ "$runTests" = true ] ; then
   say "Run tests"
@@ -49,3 +51,5 @@ if [ "$runTests" = true ] ; then
   ASPNETCORE_ENVIRONMENT=Development
   dotnet test 
 fi;
+
+cd $SCRIPT_DIR
