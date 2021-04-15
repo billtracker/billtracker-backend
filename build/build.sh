@@ -3,7 +3,7 @@ set -euo pipefail
 
 exec 3>&1 # keep near the start of the script
 function say () {
-  printf "%b\n" "[image-build-and-push] $1" >&3
+  printf "%b\n" "[build] $1" >&3
 }
 
 # https://stackoverflow.com/a/20901614
@@ -27,30 +27,27 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 dockerContextPath=$(dir_resolve "$SCRIPT_DIR/../src")
 dockerFilePath=$(dir_resolve "$SCRIPT_DIR/../src/BillTracker.Api/Dockerfile")
 
-imageName="jaceks2106/billtracker-api"
+dockerRepoName="jaceks2106/billtracker-api"
 
-releaseTag=''
+version='v0.0.1-dev'
 
 while [[ $# > 0 ]]; do
   case "$1" in
 
-    --release-tag=*) releaseTag="${1#*=}"; shift 1;;
+    --version=*) version="${1#*=}"; shift 1;;
 
     -*) echo "unknown option: $1" >&2; exit 1;;
     *) echo "unknown argument: $1" >&2; exit 1;;
   esac
 done
 
-say "Release tag: '$releaseTag'"
-releaseTagOption=''
-if [ ! -z "$releaseTag" ]; then
-  releaseTagOption="-t $imageName:$releaseTag"
+say "Version: '$version'"
+
+# 'latest' version is only when version is Release
+latestTagOption=''
+if [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then 
+  latestTagOption="-t $dockerRepoName:latest"
 fi;
 
 say "Building Docker image"
-docker build -t "$imageName:latest" $releaseTagOption -f $dockerFilePath $dockerContextPath
-
-if [ ! -z "$releaseTag" ]; then
-  say "Push Docker image"
-  docker push "jaceks2106/billtracker-api"
-fi;
+docker build $latestTagOption -t "$dockerRepoName:$version" -f $dockerFilePath $dockerContextPath

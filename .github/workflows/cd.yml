@@ -28,6 +28,7 @@ jobs:
     - name: Check output
       run: |
         echo ${{ steps.vars.outputs.tag }}
+        echo ${GITHUB_REF#refs/tags/}
 
     - name: Azure Login
       uses: Azure/login@v1
@@ -43,16 +44,9 @@ jobs:
     - name: Set scripts permissions
       run: chmod +x ./build/*.sh
 
-    # - name: Build
-    #   if: ${{ !startsWith(steps.vars.outputs.tag, 'v') }}
-    #   run: ./build/image-build-and-push.sh
-
-    - name: Build & Publish Image
-      run: ./build/image-build-and-push.sh --release-tag=${{ steps.vars.outputs.tag }}
+    - name: Build
+      run: ./build/build.sh --version=${{ steps.vars.outputs.tag }}
 
     - name: Release
       if: ${{ startsWith(steps.vars.outputs.tag, 'v') }}
-      uses: azure/CLI@v1
-      with:
-        inlineScript: |
-          az webapp restart --name billtracker-api-dev --resource-group billtracker-api-dev --subscription a08721a6-b871-437b-9b3b-b64c0beec2b7
+      run: ./build/release.sh --version=${{ steps.vars.outputs.tag }}
