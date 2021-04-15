@@ -2,6 +2,7 @@ name: BillTracker WebApi CD
 
 env:
   IS_RELEASE: GITHUB.REF == 'refs/heads/main' && startsWith(GITHUB.REF, 'refs/tags/v')
+  TAG: ${{ github.event.release.tag_name }}
 
 on: 
   workflow_dispatch:
@@ -25,6 +26,7 @@ jobs:
     - name: print script
       run: |
         echo ${{ GITHUB.REF }}
+        echo ${{ env.TAG }}
 
     - name: Azure Login
       uses: Azure/login@v1
