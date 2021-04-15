@@ -1,5 +1,8 @@
 name: BillTracker WebApi CD
 
+env:
+  IS_RELEASE: GITHUB.REF == 'refs/heads/main' && startsWith(GITHUB.REF, 'refs/tags/v')
+
 on: 
   workflow_dispatch:
 
@@ -21,6 +24,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: print script
+      run: |
+        echo $GITHUB.REF
+
     - name: Azure Login
       uses: Azure/login@v1
       with:
@@ -37,15 +44,15 @@ jobs:
       run: chmod +x ./build/*.sh
 
     - name: Build
-      if: GITHUB.REF != 'refs/heads/main'
-      run: ./build/image-build-and-push.sh --no-publish
-
-    - name: Build & Publish Image
-      if: GITHUB.REF == 'refs/heads/main' && startsWith(GITHUB.REF, 'refs/tags/v')
+      if: ${{ env.IS_RELEASE == false }}
       run: ./build/image-build-and-push.sh
 
+    - name: Build & Publish Image
+      if: ${{ env.IS_RELEASE == true }}
+      run: ./build/image-build-and-push.sh --release-tag v1.0.0
+
     - name: Release
-      if: GITHUB.REF == 'refs/heads/main' && startsWith(GITHUB.REF, 'refs/tags/v')
+      if: ${{ env.IS_RELEASE == true }}
       uses: azure/CLI@v1
       with:
         inlineScript: |

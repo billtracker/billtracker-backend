@@ -27,22 +27,30 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 dockerContextPath=$(dir_resolve "$SCRIPT_DIR/../src")
 dockerFilePath=$(dir_resolve "$SCRIPT_DIR/../src/BillTracker.Api/Dockerfile")
 
-noPublish=false
+imageName="jaceks2106/billtracker-api"
+
+releaseTag=''
 
 while [[ $# > 0 ]]; do
   case "$1" in
 
-    --no-publish) noPublish=true; shift ;;
+    --release-tag=*) releaseTag="${1#*=}"; shift 1;;
 
     -*) echo "unknown option: $1" >&2; exit 1;;
     *) echo "unknown argument: $1" >&2; exit 1;;
   esac
 done
 
-say "Building Docker image"
-docker build -t "jaceks2106/billtracker-api:latest" -f $dockerFilePath $dockerContextPath
+say "Release tag: '$releaseTag'"
+releaseTagOption=''
+if [ ! -z "$releaseTag" ]; then
+  releaseTagOption="-t $imageName:$releaseTag"
+fi;
 
-if [ "$noPublish" = false ] ; then
-  say "Pushing Docker image"
-  docker push "jaceks2106/billtracker-api:latest"
+say "Building Docker image"
+docker build -t "$imageName:latest" $releaseTagOption -f $dockerFilePath $dockerContextPath
+
+if [ ! -z "$releaseTag" ]; then
+  say "Push Docker image"
+  docker push "jaceks2106/billtracker-api"
 fi;
