@@ -36,11 +36,11 @@ jobs:
       run: ./build/image-build-and-push.sh --no-publish
 
     - name: Build & Publish Image
-      if: GITHUB.REF == 'refs/heads/main' && contains(GITHUB.REF, "v")
+      if: GITHUB.REF == 'refs/heads/main' && startsWith(GITHUB.REF, 'refs/tags/v')
       run: ./build/image-build-and-push.sh
 
     - name: Release
-      if: GITHUB.REF == 'refs/heads/main' && contains(GITHUB.REF, "v")
+      if: GITHUB.REF == 'refs/heads/main' && startsWith(GITHUB.REF, 'refs/tags/v')
       uses: azure/CLI@v1
       with:
         inlineScript: |
