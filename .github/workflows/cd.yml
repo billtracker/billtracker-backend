@@ -24,7 +24,7 @@ jobs:
 
     - name: print script
       run: |
-        echo $GITHUB.REF
+        echo ${{ GITHUB.REF }}
 
     - name: Azure Login
       uses: Azure/login@v1
