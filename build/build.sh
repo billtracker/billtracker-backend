@@ -49,11 +49,5 @@ if [[ ! "$version" =~ ^v[0-9]+\.[0-9]+\. ]]; then
   versionTagOption=''
 fi;
 
-# 'latest' version is only when version is Release, e.g. 'v1.0.0'
-latestTagOption=''
-if [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then 
-  latestTagOption="-t $dockerRepoName:latest"
-fi;
-
 say "Building Docker image"
-docker build $latestTagOption $versionTagOption -f $dockerFilePath $dockerContextPath
+docker build $versionTagOption -f $dockerFilePath $dockerContextPath

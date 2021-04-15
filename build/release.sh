@@ -21,10 +21,10 @@ while [[ $# > 0 ]]; do
 done
 
 say "Pushing docker images"
-docker push $dockerRepoName
+docker push "$dockerRepoName:$version"
 
 # Deploying app be restarting, which downloads the 'latest' version each time.
 if [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then 
-    say "Restarting App Service"
-    az webapp restart --name billtracker-api-dev --resource-group billtracker-api-dev --subscription a08721a6-b871-437b-9b3b-b64c0beec2b7
+    say "Deploying version"
+    az webapp config container set -c "$dockerRepoName:$version" --name billtracker-api-dev --resource-group billtracker-api-dev --subscription a08721a6-b871-437b-9b3b-b64c0beec2b7
 fi;
