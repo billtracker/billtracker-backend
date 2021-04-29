@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using BillTracker.Commands;
 using BillTracker.Entities;
 using BillTracker.Queries;
-using BillTracker.Shared;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -18,6 +17,7 @@ namespace BillTracker.Tests.Queries
 
         private readonly User TestUser;
         private readonly ExpenseType TestExpenseType;
+        private readonly Guid TestAggregateId;
 
         public ExpensesQueryTests(BillTrackerFixture fixture)
         {
@@ -26,6 +26,7 @@ namespace BillTracker.Tests.Queries
 
             TestUser = _fixture.CreateUser();
             TestExpenseType = _fixture.CreateExpenseType(TestUser.Id);
+            TestAggregateId = _fixture.CreateExpenseAggregate(TestUser.Id).Id;
         }
 
         [Fact]
@@ -43,11 +44,15 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGetMany_GivenFilters_ThenReturnsPartOfData()
         {
             var initDate = DateTimeOffset.Now;
-            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 15, expenseTypeId: TestExpenseType.Id, addedDate: initDate));
-            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 16, expenseTypeId: TestExpenseType.Id, addedDate: initDate.AddDays(1)));
-            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 17, expenseTypeId: TestExpenseType.Id, addedDate: initDate.AddDays(2)));
-            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 18, expenseTypeId: TestExpenseType.Id, addedDate: initDate.AddDays(3)));
+            var aggId1 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: initDate).Id;
+            var aggId2 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: initDate.AddDays(1)).Id;
+            var aggId3 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: initDate.AddDays(2)).Id;
+            var aggId4 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: initDate.AddDays(3)).Id;
+            var addExpenseService = _factory.Services.GetRequiredService<SaveExpense>();
+            var expense1 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId1, "name", 15, expenseTypeId: TestExpenseType.Id));
+            var expense2 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId2, "name", 16, expenseTypeId: TestExpenseType.Id));
+            var expense3 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId3, "name", 17, expenseTypeId: TestExpenseType.Id));
+            var expense4 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId4, "name", 18, expenseTypeId: TestExpenseType.Id));
             var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.GetMany(TestUser.Id, 1, fromDate: initDate, toDate: initDate.AddDays(2));
@@ -64,11 +69,15 @@ namespace BillTracker.Tests.Queries
         [Fact]
         public async Task WhenGetMany_GivenNoFilters_ThenReturnsAllExpenses()
         {
-            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 15, expenseTypeId: TestExpenseType.Id, addedDate: DateTimeOffset.Now));
-            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 16, expenseTypeId: TestExpenseType.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
-            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 17, expenseTypeId: TestExpenseType.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
-            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 18, expenseTypeId: TestExpenseType.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
+            var aggId1 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: DateTimeOffset.Now).Id;
+            var aggId2 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: DateTimeOffset.Now.AddDays(1)).Id;
+            var aggId3 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: DateTimeOffset.Now.AddDays(2)).Id;
+            var aggId4 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: DateTimeOffset.Now.AddDays(3)).Id;
+            var addExpenseService = _factory.Services.GetRequiredService<SaveExpense>();
+            var expense1 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId1, "name", 15, expenseTypeId: TestExpenseType.Id));
+            var expense2 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId2, "name", 16, expenseTypeId: TestExpenseType.Id));
+            var expense3 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId3, "name", 17, expenseTypeId: TestExpenseType.Id));
+            var expense4 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId4, "name", 18, expenseTypeId: TestExpenseType.Id));
             var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.GetMany(TestUser.Id, 1);
@@ -85,11 +94,15 @@ namespace BillTracker.Tests.Queries
         [Fact]
         public async Task WhenGetMany_GivenPaging_ThenReturnsSortedPartOfData()
         {
-            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 15, expenseTypeId: TestExpenseType.Id, addedDate: DateTimeOffset.Now));
-            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 16, expenseTypeId: TestExpenseType.Id, addedDate: DateTimeOffset.Now.AddDays(1)));
-            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 17, expenseTypeId: TestExpenseType.Id, addedDate: DateTimeOffset.Now.AddDays(2)));
-            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 18, expenseTypeId: TestExpenseType.Id, addedDate: DateTimeOffset.Now.AddDays(3)));
+            var aggId1 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: DateTimeOffset.Now).Id;
+            var aggId2 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: DateTimeOffset.Now.AddDays(1)).Id;
+            var aggId3 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: DateTimeOffset.Now.AddDays(2)).Id;
+            var aggId4 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: DateTimeOffset.Now.AddDays(3)).Id;
+            var addExpenseService = _factory.Services.GetRequiredService<SaveExpense>();
+            var expense1 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId1, "name", 15, expenseTypeId: TestExpenseType.Id));
+            var expense2 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId2, "name", 16, expenseTypeId: TestExpenseType.Id));
+            var expense3 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId3, "name", 17, expenseTypeId: TestExpenseType.Id));
+            var expense4 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId4, "name", 18, expenseTypeId: TestExpenseType.Id));
             var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.GetMany(TestUser.Id, 2, 2);
@@ -107,11 +120,15 @@ namespace BillTracker.Tests.Queries
         public async Task WhenGetManyExpensesAggregate_GivenFilters_ThenReturnsPartOfData()
         {
             var initDate = DateTimeOffset.Now;
-            var addExpenseService = _factory.Services.GetRequiredService<AddExpense>();
-            var expense1 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 10, expenseTypeId: TestExpenseType.Id, addedDate: initDate));
-            var expense2 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 20, expenseTypeId: TestExpenseType.Id, addedDate: initDate.AddDays(1)));
-            var expense3 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 30, expenseTypeId: TestExpenseType.Id, addedDate: initDate.AddDays(2)));
-            var expense4 = await addExpenseService.Handle(new AddExpenseParameters(TestUser.Id, "name", 40, expenseTypeId: TestExpenseType.Id, addedDate: initDate.AddDays(3)));
+            var aggId1 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: initDate).Id;
+            var aggId2 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: initDate.AddDays(1)).Id;
+            var aggId3 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: initDate.AddDays(2)).Id;
+            var aggId4 = _fixture.CreateExpenseAggregate(TestUser.Id, addedDate: initDate.AddDays(3)).Id;
+            var addExpenseService = _factory.Services.GetRequiredService<SaveExpense>();
+            var expense1 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId1, "name", 10, expenseTypeId: TestExpenseType.Id));
+            var expense2 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId2, "name", 20, expenseTypeId: TestExpenseType.Id));
+            var expense3 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId3, "name", 30, expenseTypeId: TestExpenseType.Id));
+            var expense4 = await addExpenseService.Handle(new SaveExpenseParameters(TestUser.Id, aggId4, "name", 40, expenseTypeId: TestExpenseType.Id));
             var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.GetManyExpensesAggregate(TestUser.Id, 1, fromDate: initDate, toDate: initDate.AddDays(2));
@@ -119,25 +136,30 @@ namespace BillTracker.Tests.Queries
             result.IsError.Should().BeFalse();
             result.Result.TotalItems.Should().Be(3);
             result.Result.Items.Count().Should().Be(3);
-            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense1.Result.Id) && agg.TotalAmount == 10);
-            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense2.Result.Id) && agg.TotalAmount == 20);
-            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense3.Result.Id) && agg.TotalAmount == 30);
+            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense1.Result.Id) && agg.TotalExpensesPrice == 10);
+            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense2.Result.Id) && agg.TotalExpensesPrice == 20);
+            result.Result.Items.Should().Contain(agg => agg.Expenses.Any(x => x.Id == expense3.Result.Id) && agg.TotalExpensesPrice == 30);
             result.Result.Items.All(agg => !agg.Expenses.Any(x => x.Id == expense4.Result.Id)).Should().BeTrue();
         }
 
         [Fact]
         public async Task WhenGetExpensesAggregateThenReturnsProperValues()
         {
-            var expense = _fixture.CreateExpense(TestUser.Id, "name");
+            var expense = _fixture.CreateExpense(TestUser.Id, "name", amount: 3);
             var sut = _factory.Services.GetRequiredService<ExpensesQuery>();
 
             var result = await sut.GetExpensesAggregate(expense.AggregateId);
 
             result.Should().NotBeNull();
             result.UserId.Should().Be(TestUser.Id);
-            result.Name.Should().Be("name");
+            result.Name.Should().Be("expense");
+            result.Price.Should().Be(20);
+            result.TotalExpensesPrice.Should().Be(60);
             result.IsDraft.Should().BeFalse();
             result.Expenses.Should().ContainSingle();
+            result.Expenses.Single().Name.Should().Be("name");
+            result.Expenses.Single().Price.Should().Be(20);
+            result.Expenses.Single().Amount.Should().Be(3);
             result.Bills.Should().BeEmpty();
         }
     }

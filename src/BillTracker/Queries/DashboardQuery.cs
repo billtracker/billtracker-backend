@@ -41,7 +41,7 @@ namespace BillTracker.Queries
         private static async Task<MetricsModel> GetMetrics(IQueryable<Expense> baseQuery)
         {
             var mostExpensive = await baseQuery
-                .OrderByDescending(x => x.Amount)
+                .OrderByDescending(x => x.Price * x.Amount)
                 .Select(x => x.ToModel())
                 .FirstOrDefaultAsync();
 
@@ -50,7 +50,7 @@ namespace BillTracker.Queries
                     x => x.Aggregate.UserId,
                     (key, expenses) => new
                     {
-                        Total = expenses.Sum(x => x.Amount),
+                        Total = expenses.Sum(x => x.Price * x.Amount),
                         Transfers = expenses.Count(),
                     })
                 .SingleOrDefaultAsync();
@@ -72,7 +72,7 @@ namespace BillTracker.Queries
                     {
                         ExpenseTypeId = key.Id,
                         ExpenseTypeName = key.Name,
-                        Total = types.Sum(x => x.Amount),
+                        Total = types.Sum(x => x.Price * x.Amount),
                     })
                 .ToListAsync();
 
@@ -104,7 +104,7 @@ namespace BillTracker.Queries
                 .Select(x => new CalendarDayModel
                 {
                     Day = x.AddedDate,
-                    Total = x.TotalAmount,
+                    Total = x.TotalPrice,
                 })
                 .ToListAsync();
 

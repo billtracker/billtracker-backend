@@ -69,7 +69,7 @@ namespace BillTracker.Entities
                            .ToSqlQuery($@"
 SELECT
     ea.""{nameof(ExpensesAggregate.UserId)}"" AS ""{nameof(DashboardCalendarDayView.UserId)}"",
-    SUM(e.""{nameof(Expense.Amount)}"") AS ""{nameof(DashboardCalendarDayView.TotalAmount)}"",
+    SUM(e.""{nameof(Expense.Price)}"" * e.""{nameof(Expense.Amount)}"") AS ""{nameof(DashboardCalendarDayView.TotalPrice)}"",
     ea.""{nameof(ExpensesAggregate.AddedDate)}""::DATE AS ""{nameof(DashboardCalendarDayView.AddedDate)}""
 FROM ""{nameof(Expenses)}"" AS e
 JOIN ""{nameof(ExpensesAggregates)}"" AS ea ON e.""{nameof(Expense.AggregateId)}"" = ea.""{nameof(ExpensesAggregate.Id)}""

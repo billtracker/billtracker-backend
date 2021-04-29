@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using BillTracker.Api.Models;
@@ -16,14 +15,14 @@ namespace BillTracker.Api.Controllers
     [Route("expenses")]
     public class ExpensesController : ControllerBase
     {
-        private readonly AddExpense _addExpenseHandler;
+        private readonly SaveExpense _saveExpenseHandler;
         private readonly ExpensesQuery _expensesQuery;
 
         public ExpensesController(
-            AddExpense addExpenseHandler,
+            SaveExpense addExpenseHandler,
             ExpensesQuery expensesQuery)
         {
-            _addExpenseHandler = addExpenseHandler;
+            _saveExpenseHandler = addExpenseHandler;
             _expensesQuery = expensesQuery;
         }
 
@@ -64,22 +63,24 @@ namespace BillTracker.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ExpenseModel>> Post(AddExpenseRequest request)
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ExpenseModel>> Put(SaveExpenseRequest request)
         {
-            var result = await _addExpenseHandler.Handle(
-                new AddExpenseParameters(
+            var result = await _saveExpenseHandler.Handle(
+                new SaveExpenseParameters(
                     this.GetUserId(),
+                    aggregateId: request.AggregateId.Value,
                     request.Name,
-                    request.Amount,
-                    request.AddedDate,
-                    aggregateId: request.AggregateId,
+                    price: request.Price,
+                    amount: request.Amount,
+                    expenseId: request.ExpenseId,
                     expenseTypeId: request.ExpenseTypeId));
 
             return result.Match<ActionResult>(
-                success => Ok(result.Result),
+                success => result.Result is null ? NotFound() : Ok(result.Result),
                 error => BadRequest(error));
         }
     }

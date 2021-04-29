@@ -11,7 +11,10 @@ namespace BillTracker.Entities
         public string Name { get; private set; }
 
         [Required]
-        public decimal Amount { get; private set; }
+        public decimal Price { get; private set; }
+
+        [Required]
+        public int Amount { get; private set; }
 
         public Guid? ExpenseTypeId { get; private set; }
 
@@ -24,15 +27,29 @@ namespace BillTracker.Entities
 
         public static Expense Create(
             string name,
-            decimal amount,
+            decimal price,
+            int amount,
             Guid aggregateId,
             Guid? expenseTypeId = null) => new Expense
             {
                 Id = Guid.NewGuid(),
                 Name = name,
+                Price = price,
                 Amount = amount,
                 ExpenseTypeId = expenseTypeId,
                 AggregateId = aggregateId,
             };
+
+        public void Update(
+            string name = null,
+            decimal? price = null,
+            int? amount = null,
+            Guid? expenseTypeId = null)
+        {
+            Name = string.IsNullOrEmpty(name) ? Name : name;
+            Price = price ?? Price;
+            Amount = amount ?? Amount;
+            ExpenseTypeId = expenseTypeId ?? ExpenseTypeId;
+        }
     }
 }

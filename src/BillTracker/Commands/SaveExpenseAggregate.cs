@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BillTracker.Entities;
-using BillTracker.Models;
 using BillTracker.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +28,7 @@ namespace BillTracker.Commands
 
         private async Task<Guid> Create(SaveExpenseAggregateParameters parameters)
         {
-            var aggregate = ExpensesAggregate.Create(parameters.UserId, parameters.Name, parameters.AddedDate, parameters.IsDraft);
+            var aggregate = ExpensesAggregate.Create(parameters.UserId, parameters.Name, parameters.Price, parameters.AddedDate, parameters.IsDraft);
             await _context.ExpensesAggregates.AddAsync(aggregate);
             await _context.SaveChangesAsync();
             return aggregate.Id;
@@ -55,11 +54,12 @@ namespace BillTracker.Commands
 
     public class SaveExpenseAggregateParameters
     {
-        public SaveExpenseAggregateParameters(Guid? id, Guid userId, string name, DateTimeOffset? addedDate = null, bool isDraft = false)
+        public SaveExpenseAggregateParameters(Guid? id, Guid userId, string name, decimal price, DateTimeOffset? addedDate = null, bool isDraft = false)
         {
             Id = id;
             UserId = userId;
             Name = name;
+            Price = price;
             AddedDate = addedDate ?? DateTimeOffset.Now;
             IsDraft = isDraft;
         }
@@ -69,6 +69,8 @@ namespace BillTracker.Commands
         public Guid UserId { get; }
 
         public string Name { get; }
+
+        public decimal Price { get; }
 
         public DateTimeOffset AddedDate { get; }
 

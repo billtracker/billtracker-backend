@@ -34,7 +34,7 @@ namespace BillTracker.Api
             services.ConfigureAuthentication(Configuration);
             services.ConfigureSwaggerGen();
 
-            services.AddConfiguration<RecaptchaConfiguration>(Configuration, RecaptchaConfiguration.SectionName);
+            services.AddConfiguration<RecaptchaConfiguration>(Configuration, RecaptchaConfiguration.SectionName, optional: true);
 
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
         }

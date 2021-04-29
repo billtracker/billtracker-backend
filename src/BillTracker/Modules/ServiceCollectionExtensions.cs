@@ -25,7 +25,7 @@ namespace BillTracker.Modules
             services.AddTransient<IBillFileStorage, AzureBillBlobStorage>();
 
             // Commands
-            services.AddTransient<AddExpense>();
+            services.AddTransient<SaveExpense>();
             services.AddTransient<UploadBillFile>();
             services.AddTransient<CreateExpenseType>();
             services.AddTransient<SetupNewUser>();

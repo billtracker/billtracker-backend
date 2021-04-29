@@ -8,7 +8,9 @@ namespace BillTracker.Models
 
         public string Name { get; init; }
 
-        public decimal Amount { get; init; }
+        public decimal Price { get; init; }
+
+        public int Amount { get; init; }
 
         public Guid? ExpenseTypeId { get; init; }
 

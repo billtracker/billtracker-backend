@@ -8,6 +8,6 @@ namespace BillTracker.Entities
 
         public DateTime AddedDate { get; private set; }
 
-        public decimal TotalAmount { get; private set; }
+        public decimal TotalPrice { get; private set; }
     }
 }

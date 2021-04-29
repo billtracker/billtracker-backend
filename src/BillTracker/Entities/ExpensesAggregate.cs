@@ -18,6 +18,9 @@ namespace BillTracker.Entities
         public string Name { get; private set; }
 
         [Required]
+        public decimal Price { get; private set; }
+
+        [Required]
         public DateTimeOffset AddedDate { get; private set; }
 
         public IEnumerable<Expense> Expenses { get; private set; }
@@ -30,12 +33,14 @@ namespace BillTracker.Entities
         public static ExpensesAggregate Create(
             Guid userId,
             string name,
+            decimal price,
             DateTimeOffset addedDate,
             bool isDraft) => new ExpensesAggregate
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 Name = name,
+                Price = price,
                 AddedDate = addedDate,
                 IsDraft = isDraft,
                 Expenses = new List<Expense>(),
@@ -44,10 +49,12 @@ namespace BillTracker.Entities
 
         public void Update(
             string name = null,
+            decimal? price = null,
             DateTimeOffset? addedDate = null,
             bool? isDraft = null)
         {
             Name = string.IsNullOrEmpty(name) ? Name : name;
+            Price = price ?? Price;
             AddedDate = addedDate ?? AddedDate;
             IsDraft = isDraft ?? IsDraft;
         }

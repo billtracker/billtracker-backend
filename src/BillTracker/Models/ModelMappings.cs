@@ -10,6 +10,7 @@ namespace BillTracker.Models
                {
                    Id = entity.Id,
                    Name = entity.Name,
+                   Price = entity.Price,
                    UserId = entity.UserId,
                    IsDraft = entity.IsDraft,
                    Expenses = entity.Expenses.Select(x => x.ToModel()),
@@ -21,6 +22,7 @@ namespace BillTracker.Models
             {
                 Id = expense.Id,
                 Name = expense.Name,
+                Price = expense.Price,
                 Amount = expense.Amount,
                 ExpenseTypeId = expense.ExpenseTypeId,
                 AggregateId = expense.AggregateId,

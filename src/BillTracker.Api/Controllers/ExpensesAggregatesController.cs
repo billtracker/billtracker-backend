@@ -36,9 +36,10 @@ namespace BillTracker.Api.Controllers
         {
             var result = await _saveExpenseAggregate.Handle(
                 new SaveExpenseAggregateParameters(
-                    request.Id,
+                    request.AggregateId,
                     this.GetUserId(),
                     request.Name,
+                    request.Price,
                     request.AddedDate,
                     request.IsDraft));
 
